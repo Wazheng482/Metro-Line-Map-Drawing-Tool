@@ -80,7 +80,10 @@ const Canvas = (() => {
                          target.closest('#canvasContent') === null;
 
     if (isBackground) {
-      if (state.selectedTool === 'select') {
+      if (state.selectedTool === 'line') {
+        // 线路工具下拖拽空白 = 平移地图
+        startPan(e);
+      } else if (state.selectedTool === 'select') {
         // 选择工具下拖拽空白 = 平移地图；点击（不拖拽）= 取消选中
         startPan(e);
         panClickPending = true;
