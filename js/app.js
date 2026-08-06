@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function init() {
+  Settings.init();
   Canvas.init();
   Properties.init();
   Toolbar.init();
@@ -79,11 +80,6 @@ function setupGlobalEvents() {
   document.getElementById('fitViewBtn').addEventListener('click', () => {
     State.setZoom(1);
     State.setOffset(0, 0);
-  });
-  document.getElementById('clearBtn').addEventListener('click', () => {
-    if (confirm('确定要清空画布吗？此操作不可撤销。')) {
-      State.clearAll();
-    }
   });
 
   // 左侧面板折叠

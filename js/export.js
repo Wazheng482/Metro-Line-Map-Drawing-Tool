@@ -15,7 +15,7 @@ const Export = (() => {
     const toggleImg = document.getElementById('toggleImageDownload');
     const imgPanel = document.getElementById('imageDownloadPanel');
     toggleImg.addEventListener('change', () => {
-      imgPanel.style.display = toggleImg.checked ? 'block' : 'none';
+      imgPanel.classList.toggle('show', toggleImg.checked);
       updateStartBtn();
     });
 
@@ -31,7 +31,7 @@ const Export = (() => {
     const toggleAudio = document.getElementById('toggleAudioDownload');
     const audioPanel = document.getElementById('audioDownloadPanel');
     toggleAudio.addEventListener('change', () => {
-      audioPanel.style.display = toggleAudio.checked ? 'block' : 'none';
+      audioPanel.classList.toggle('show', toggleAudio.checked);
       updateStartBtn();
     });
 
