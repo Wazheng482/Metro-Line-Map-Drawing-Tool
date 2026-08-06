@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+cpolar-app/
+cpolar/
+*.zip
+*.msi
+.trae/
+serve.py
+add-hosts.bat
+start-server.bat

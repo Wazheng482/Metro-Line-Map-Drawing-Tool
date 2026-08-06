@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地铁线路图绘制工具</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="app">
+  <!-- 顶部工具栏 -->
+  <header class="top-bar">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+        <line x1="9" y1="9" x2="9.01" y2="9"/>
+        <line x1="15" y1="9" x2="15.01" y2="9"/>
+      </svg>
+      <span class="brand-name">Metro Map Studio</span>
+    </div>
+    <div class="top-actions">
+      <button class="btn-ghost" id="undoBtn" title="撤销 (Ctrl+Z)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+      </button>
+      <button class="btn-ghost" id="redoBtn" title="重做 (Ctrl+Y)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg>
+      </button>
+      <div class="divider"></div>
+      <button class="btn-ghost" id="zoomOutBtn" title="缩小">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      </button>
+      <span class="zoom-label" id="zoomLabel">100%</span>
+      <button class="btn-ghost" id="zoomInBtn" title="放大">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      </button>
+      <button class="btn-ghost" id="fitViewBtn" title="适应视图">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+      <div class="divider"></div>
+      <button class="btn-primary" id="exportBtn" title="导出预览">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>导出</span>
+      </button>
+      <button class="btn-danger" id="clearBtn" title="清空画布">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <!-- 左侧属性面板 -->
+    <aside class="left-panel" id="leftPanel">
+      <div class="panel-header">
+        <span class="panel-title">属性面板</span>
+        <button class="btn-icon" id="collapseLeftBtn" title="折叠">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+      </div>
+      <div class="panel-body" id="propertyPanel">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p>选择画布中的元素以编辑属性</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 中间画布 -->
+    <main class="canvas-container" id="canvasContainer">
+      <svg id="canvas" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid-small" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="1" fill="rgba(148,163,184,0.3)"/>
+          </pattern>
+          <pattern id="grid-large" width="100" height="100" patternUnits="userSpaceOnUse">
+            <rect width="100" height="100" fill="url(#grid-small)"/>
+            <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(148,163,184,0.15)" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <rect id="gridRect" x="-100000" y="-100000" width="200000" height="200000" fill="url(#grid-large)"/>
+        <g id="canvasContent"></g>
+        <g id="overlay"></g>
+      </svg>
+      <div class="canvas-hint" id="canvasHint"></div>
+      <div class="canvas-status">
+        <span id="statusText">就绪</span>
+      </div>
+    </main>
+
+    <!-- 右侧工具栏 -->
+    <aside class="right-panel" id="rightPanel">
+      <div class="panel-header">
+        <span class="panel-title">工具</span>
+      </div>
+      <div class="panel-body">
+        <div class="tool-section">
+          <div class="section-label">选择</div>
+          <div class="tool-grid">
+            <button class="tool-btn active" data-tool="select" title="选择工具 (V)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
+              <span>选择</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="tool-section">
+          <div class="section-label">站点 <span class="hint-text">拖拽到画布</span></div>
+          <div class="tool-grid">
+            <div class="tool-card" draggable="true" data-tool="station-normal" title="普通站点">
+              <div class="tool-icon station-normal-icon">
+                <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="6" fill="currentColor"/></svg>
+              </div>
+              <span>普通站</span>
+            </div>
+            <div class="tool-card" draggable="true" data-tool="station-interchange" title="换乘站点">
+              <div class="tool-icon station-interchange-icon">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="8" fill="none" stroke="currentColor" stroke-width="3"/>
+                  <circle cx="20" cy="20" r="3" fill="currentColor"/>
+                </svg>
+              </div>
+              <span>换乘站</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tool-section">
+          <div class="section-label">创建</div>
+          <div class="tool-grid">
+            <button class="tool-btn" data-tool="line" title="线路工具 (L)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="20" x2="20" y2="4"/><circle cx="4" cy="20" r="2" fill="currentColor"/><circle cx="20" cy="4" r="2" fill="currentColor"/></svg>
+              <span>线路</span>
+            </button>
+            <button class="tool-btn" data-tool="text" title="文本工具 (T)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+              <span>文本</span>
+            </button>
+          </div>
+        </div>
+
+        
+      </div>
+    </aside>
+  </div>
+
+  <!-- 导出预览弹窗 -->
+  <div class="modal-overlay" id="exportModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>导出预览</h2>
+        <button class="btn-icon" id="closeExportBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="preview-area" id="previewArea">
+          <!-- 预览内容将在此动态生成 -->
+        </div>
+        <div class="export-sections" style="padding:12px 0; border-top:1px solid var(--border); margin-top:8px;">
+          <!-- 图片下载 -->
+          <label class="export-toggle">
+            <input type="checkbox" id="toggleImageDownload" style="width:16px; height:16px;">
+            <span style="font-size:14px; font-weight:600;">图片下载</span>
+          </label>
+          <div id="imageDownloadPanel" class="export-panel" style="display:none; padding:12px 0 0 24px;">
+            <div class="prop-group" style="margin-bottom:10px;">
+              <label class="prop-label">格式</label>
+              <div style="display:flex; gap:16px; align-items:center;">
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:13px;">
+                  <input type="radio" name="imgFormat" value="svg" checked style="width:14px; height:14px;"> SVG
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:13px;">
+                  <input type="radio" name="imgFormat" value="png" style="width:14px; height:14px;"> PNG
+                </label>
+              </div>
+            </div>
+            <div class="prop-group" id="resolutionGroup" style="margin-bottom:10px; display:none;">
+              <label class="prop-label">分辨率倍数</label>
+              <select class="prop-input prop-select" id="pngScale" style="width:auto;">
+                <option value="1">1x（原始尺寸）</option>
+                <option value="2" selected>2x（高清）</option>
+                <option value="3">3x（超清）</option>
+                <option value="4">4x（印刷级）</option>
+              </select>
+            </div>
+            <div class="prop-group" style="margin-bottom:10px;">
+              <label class="prop-label">图例位置</label>
+              <select class="prop-input prop-select" id="legendCorner" style="width:auto;">
+                <option value="top-left">左上角</option>
+                <option value="top-right" selected>右上角</option>
+                <option value="bottom-left">左下角</option>
+                <option value="bottom-right">右下角</option>
+              </select>
+            </div>
+          </div>
+          <!-- 报站音频下载 -->
+          <label class="export-toggle" style="display:flex; margin-top:4px;">
+            <input type="checkbox" id="toggleAudioDownload" style="width:16px; height:16px;">
+            <span style="font-size:14px; font-weight:600;">报站音频下载</span>
+          </label>
+          <div id="audioDownloadPanel" class="export-panel" style="display:none; padding:12px 0 0 24px;">
+            <div style="font-size:12px; color:var(--text-muted); line-height:1.8; padding:10px 12px; background:var(--bg-primary); border-radius:6px; margin-bottom:10px;">
+              点击"开始下载"后，浏览器会弹出共享对话框：<br>
+              1. 选择<strong>当前标签页</strong><br>
+              2. <strong>务必勾选</strong>底部"分享标签页音频"复选框<br>
+              3. 点击"分享"，系统将逐条朗读并录制为 WAV 音频<br>
+              4. 请保持标签页在前台，录制完成自动下载 ZIP<br>
+              <br>
+              <span style="color:var(--warning);">注意：如不勾选音频共享，将回退为导出文本文件 + Python 脚本。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" id="startDownloadBtn" style="width:100%; justify-content:center;">开始下载</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="js/state.js"></script>
+<script src="js/geometry.js"></script>
+<script src="js/canvas.js"></script>
+<script src="js/properties.js"></script>
+<script src="js/toolbar.js"></script>
+<script src="js/export.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
