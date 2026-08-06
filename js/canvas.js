@@ -664,19 +664,19 @@ const Canvas = (() => {
     
     if (state.selectedTool === 'line') {
       if (state.reconnectingLineId) {
-        statusEl.textContent = '重新连接：拖拽经过站点重新指定路径，松开完成';
-        hintEl.textContent = '拖拽经过新站点序列';
+        statusEl.textContent = Settings.t('statusReconnect');
+        hintEl.textContent = Settings.t('hintReconnect');
       } else {
-        statusEl.textContent = '线路模式：从站点按下拖拽，经过站点自动连接，松开完成';
-        hintEl.textContent = '按住拖拽经过多个站点';
+        statusEl.textContent = Settings.t('statusLineMode');
+        hintEl.textContent = Settings.t('hintLineMode');
       }
       hintEl.classList.add('show');
     } else if (state.selectedTool === 'text') {
-      statusEl.textContent = '文本模式：点击画布添加文本';
-      hintEl.textContent = '点击画布添加文本框';
+      statusEl.textContent = Settings.t('statusTextMode');
+      hintEl.textContent = Settings.t('hintTextMode');
       hintEl.classList.add('show');
     } else {
-      statusEl.textContent = `就绪 | 站点: ${state.stations.length} | 线路: ${state.lines.length} | 文本: ${state.textBlocks.length}`;
+      statusEl.textContent = `${Settings.t('stations')}: ${state.stations.length}  |  ${Settings.t('lines')}: ${state.lines.length}  |  ${Settings.t('texts')}: ${state.textBlocks.length}`;
       hintEl.classList.remove('show');
     }
   }
@@ -684,6 +684,7 @@ const Canvas = (() => {
   return {
     init,
     renderAll,
+    updateStatus,
     getCanvasPoint,
     zoom: () => zoom,
     setZoom: (z) => {

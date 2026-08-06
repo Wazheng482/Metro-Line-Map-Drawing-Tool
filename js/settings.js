@@ -77,7 +77,16 @@ const Settings = (() => {
       fontSansSerif: '无衬线',
       fontSerif: '衬线体',
       unknown: '未知',
-      expandPanel: '展开属性面板'
+      expandPanel: '展开属性面板',
+      stations: '站点',
+      lines: '线路',
+      texts: '文本',
+      statusLineMode: '线路模式：从站点按下拖拽，经过站点自动连接，松开完成',
+      statusReconnect: '重新连接：拖拽经过站点重新指定路径，松开完成',
+      statusTextMode: '文本模式：点击画布添加文本',
+      hintLineMode: '按住拖拽经过多个站点',
+      hintReconnect: '拖拽经过新站点序列',
+      hintTextMode: '点击画布添加文本框'
     },
     en: {
       export: 'Export',
@@ -156,7 +165,16 @@ const Settings = (() => {
       fontSansSerif: 'Sans-serif',
       fontSerif: 'Serif',
       unknown: 'Unknown',
-      expandPanel: 'Expand properties panel'
+      expandPanel: 'Expand properties panel',
+      stations: 'Stations',
+      lines: 'Lines',
+      texts: 'Texts',
+      statusLineMode: 'Line mode: drag from station through stations to connect, release to finish',
+      statusReconnect: 'Reconnect: drag through stations to redefine path, release to finish',
+      statusTextMode: 'Text mode: click canvas to add text',
+      hintLineMode: 'Hold and drag through multiple stations',
+      hintReconnect: 'Drag through new station sequence',
+      hintTextMode: 'Click canvas to add text box'
     }
   };
 
@@ -368,6 +386,11 @@ const Settings = (() => {
     // 重新渲染属性面板（属性面板内容由 JS 动态生成，需要重新渲染以应用新语言）
     if (typeof Properties !== 'undefined' && typeof Properties.render === 'function') {
       try { Properties.render(); } catch (e) { /* Properties 尚未初始化 */ }
+    }
+
+    // 更新状态栏文本
+    if (typeof Canvas !== 'undefined' && typeof Canvas.updateStatus === 'function') {
+      try { Canvas.updateStatus(State.getState()); } catch (e) { /* Canvas 尚未初始化 */ }
     }
   }
 

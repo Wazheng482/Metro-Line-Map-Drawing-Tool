@@ -243,8 +243,8 @@ body {
   height: 60px;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
-  border-right: none;
-  border-radius: 6px 0 0 6px;
+  border-left: none;
+  border-radius: 0 6px 6px 0;
   color: var(--text-secondary);
   cursor: pointer;
   display: flex;
