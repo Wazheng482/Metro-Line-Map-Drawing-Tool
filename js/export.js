@@ -41,6 +41,11 @@ const Export = (() => {
       legendCorner.addEventListener('change', generatePreview);
     }
 
+    const legendLangCn = document.getElementById('legendLangCn');
+    const legendLangEn = document.getElementById('legendLangEn');
+    if (legendLangCn) legendLangCn.addEventListener('change', generatePreview);
+    if (legendLangEn) legendLangEn.addEventListener('change', generatePreview);
+
     // 统一"开始下载"按钮
     document.getElementById('startDownloadBtn').addEventListener('click', startDownload);
 
@@ -112,6 +117,15 @@ const Export = (() => {
     return sel ? sel.value : 'top-right';
   }
 
+  function getLegendLangs() {
+    const cn = document.getElementById('legendLangCn');
+    const en = document.getElementById('legendLangEn');
+    return {
+      cn: cn ? cn.checked : true,
+      en: en ? en.checked : true
+    };
+  }
+
   function createExportSvg(state) {
     // 计算边界
     const bounds = calculateBounds(state);
@@ -141,7 +155,9 @@ const Export = (() => {
       const stations = line.stationIds.map(id => state.stations.find(s => s.id === id)).filter(Boolean);
       if (stations.length < 2) return;
 
-      const points = Geometry.generateMultiStationPath(stations);
+      // 环线：首尾相连
+      const pathStations = line.isLoop ? [...stations, stations[0]] : stations;
+      const points = Geometry.generateMultiStationPath(pathStations);
       const pathData = Geometry.pointsToPathData(
         points.map(p => ({ x: p.x + offsetX, y: p.y + offsetY }))
       );
@@ -158,6 +174,8 @@ const Export = (() => {
 
     // 渲染站点（含双语标签）
     state.stations.forEach(station => {
+      const linesReferencing = state.lines.filter(l => l.stationIds.includes(station.id));
+      const isTransfer = linesReferencing.length > 1;
       const x = station.x + offsetX;
       const y = station.y + offsetY;
 
@@ -165,9 +183,9 @@ const Export = (() => {
       const circle = document.createElementNS(SVG_NS, 'circle');
       circle.setAttribute('cx', x);
       circle.setAttribute('cy', y);
-      circle.setAttribute('r', station.type === 'interchange' ? 10 : 7);
+      circle.setAttribute('r', isTransfer ? 10 : 7);
 
-      if (station.type === 'interchange') {
+      if (isTransfer) {
         circle.setAttribute('fill', '#ffffff');
         circle.setAttribute('stroke', '#0f172a');
         circle.setAttribute('stroke-width', '3');
@@ -242,12 +260,15 @@ const Export = (() => {
     const barHeight = 40;
     const entryGap = 8;
     const textGap = 8;
+    const langs = getLegendLangs();
+    const showCn = langs.cn;
+    const showEn = langs.en;
 
-    // 估算每条线路文本所需宽度
     function estimateTextWidth(line) {
-      const cnLen = (line.name || '').length * 14;
-      const enLen = (line.nameEn || '').length * 7;
-      return Math.max(60, cnLen, enLen);
+      let w = 0;
+      if (showCn) w = Math.max(w, (line.name || '').length * 14);
+      if (showEn) w = Math.max(w, (line.nameEn || '').length * 7);
+      return Math.max(60, w);
     }
 
     const maxTextWidth = Math.max(...lines.map(estimateTextWidth));
@@ -275,7 +296,6 @@ const Export = (() => {
     const group = document.createElementNS(SVG_NS, 'g');
     group.setAttribute('class', 'legend');
 
-    // 半透明白色背景
     const bgRect = document.createElementNS(SVG_NS, 'rect');
     bgRect.setAttribute('x', legendX);
     bgRect.setAttribute('y', legendY);
@@ -292,7 +312,6 @@ const Export = (() => {
       const entryX = legendX + pad;
       const entryY = legendY + pad + i * (barHeight + entryGap);
 
-      // 垂直颜色条
       const bar = document.createElementNS(SVG_NS, 'rect');
       bar.setAttribute('x', entryX);
       bar.setAttribute('y', entryY);
@@ -303,27 +322,30 @@ const Export = (() => {
       group.appendChild(bar);
 
       const textX = entryX + barWidth + textGap;
+      let nameY = entryY + 16;
 
-      // 中文名（上方，加粗，font-size 13）
-      const nameCn = document.createElementNS(SVG_NS, 'text');
-      nameCn.setAttribute('x', textX);
-      nameCn.setAttribute('y', entryY + 16);
-      nameCn.setAttribute('font-size', '13');
-      nameCn.setAttribute('font-weight', 'bold');
-      nameCn.setAttribute('font-family', 'Microsoft YaHei, sans-serif');
-      nameCn.setAttribute('fill', '#0f172a');
-      nameCn.textContent = line.name || '未命名线路';
-      group.appendChild(nameCn);
+      if (showCn) {
+        const nameCn = document.createElementNS(SVG_NS, 'text');
+        nameCn.setAttribute('x', textX);
+        nameCn.setAttribute('y', nameY);
+        nameCn.setAttribute('font-size', '13');
+        nameCn.setAttribute('font-weight', 'bold');
+        nameCn.setAttribute('font-family', 'Microsoft YaHei, sans-serif');
+        nameCn.setAttribute('fill', '#0f172a');
+        nameCn.textContent = line.name || '未命名线路';
+        group.appendChild(nameCn);
+      }
 
-      // 英文名（下方，灰色，font-size 10）
-      const nameEn = document.createElementNS(SVG_NS, 'text');
-      nameEn.setAttribute('x', textX);
-      nameEn.setAttribute('y', entryY + 32);
-      nameEn.setAttribute('font-size', '10');
-      nameEn.setAttribute('font-family', 'Microsoft YaHei, sans-serif');
-      nameEn.setAttribute('fill', '#64748b');
-      nameEn.textContent = line.nameEn || '';
-      group.appendChild(nameEn);
+      if (showEn) {
+        const nameEn = document.createElementNS(SVG_NS, 'text');
+        nameEn.setAttribute('x', textX);
+        nameEn.setAttribute('y', nameY + (showCn ? 16 : 0));
+        nameEn.setAttribute('font-size', '10');
+        nameEn.setAttribute('font-family', 'Microsoft YaHei, sans-serif');
+        nameEn.setAttribute('fill', '#64748b');
+        nameEn.textContent = line.nameEn || '';
+        group.appendChild(nameEn);
+      }
     });
 
     svg.appendChild(group);

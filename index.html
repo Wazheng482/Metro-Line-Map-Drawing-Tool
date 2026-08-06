@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Metro Line Map Drawing Tool</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2'><rect x='5' y='3' width='14' height='14' rx='3'/><circle cx='12' cy='10' r='2'/><line x1='5' y1='20' x2='8' y2='17'/><line x1='19' y1='20' x2='16' y2='17'/><circle cx='8' cy='17' r='1'/><circle cx='16' cy='17' r='1'/></svg>">
-<link rel="stylesheet" href="css/styles.css">
+<title>地铁线路图绘制工具-Metro Line Map Drawing Tool</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%233b82f6'><circle cx='8' cy='8' r='5'/><circle cx='8' cy='8' r='2' fill='white'/></svg>">
+<link rel="stylesheet" href="css/styles.css?v=10">
 </head>
 <body>
 
@@ -13,17 +13,29 @@
   <!-- 顶部工具栏 -->
   <header class="top-bar">
     <div class="brand">
-      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="5" y="3" width="14" height="14" rx="3"/>
-        <circle cx="12" cy="10" r="2"/>
-        <line x1="5" y1="20" x2="8" y2="17"/>
-        <line x1="19" y1="20" x2="16" y2="17"/>
-        <circle cx="8" cy="17" r="1"/>
-        <circle cx="16" cy="17" r="1"/>
+      <svg class="brand-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="8" r="5"/>
+        <circle cx="8" cy="8" r="2" fill="currentColor"/>
       </svg>
       <span class="brand-name">Metro Line Map Drawing Tool</span>
     </div>
     <div class="top-actions">
+      <!-- 工具按钮组 -->
+      <div class="tool-group" id="topToolGroup">
+        <button class="tool-btn active" data-tool="select" title="选择 (V)" data-i18n-title="selectTool">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
+          <span data-i18n="select">选择</span>
+        </button>
+        <button class="tool-btn" data-tool="station" title="站点 (S)" data-i18n-title="stationTool">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>
+          <span data-i18n="station">站点</span>
+        </button>
+        <button class="tool-btn" data-tool="line" title="线路 (L)" data-i18n-title="lineTool">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="20" x2="20" y2="4"/><circle cx="4" cy="20" r="2" fill="currentColor"/><circle cx="20" cy="4" r="2" fill="currentColor"/></svg>
+          <span data-i18n="line">线路</span>
+        </button>
+      </div>
+      <div class="divider"></div>
       <button class="btn-ghost" id="undoBtn" title="撤销 (Ctrl+Z)" data-i18n-title="undo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
       </button>
@@ -42,35 +54,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
       </button>
       <div class="divider"></div>
-      <div class="settings-wrapper">
-        <button class="btn-ghost" id="settingsBtn" title="设置" data-i18n-title="settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
-        <div class="settings-dropdown" id="settingsDropdown">
-          <div class="settings-section">
-            <div class="settings-label" data-i18n="backgroundColor">背景颜色</div>
-            <div class="bg-options">
-              <button class="bg-option" data-bg="white" style="background:#ffffff; border-color:#475569;" title="白色"></button>
-              <button class="bg-option active" data-bg="dark-blue" style="background:#0f172a;" title="深蓝"></button>
-              <button class="bg-option" data-bg="black" style="background:#000000; border-color:#475569;" title="黑色"></button>
-            </div>
-          </div>
-          <div class="settings-section">
-            <div class="settings-label" data-i18n="grid">网格</div>
-            <label class="switch">
-              <input type="checkbox" id="gridToggle" checked>
-              <span class="switch-slider"></span>
-            </label>
-          </div>
-          <div class="settings-section">
-            <div class="settings-label" data-i18n="language">语言</div>
-            <select class="prop-input prop-select settings-select" id="languageSelect">
-              <option value="zh" selected>中文</option>
-              <option value="en">English</option>
-            </select>
-          </div>
-        </div>
-      </div>
+      <button class="btn-ghost" id="settingsBtn" title="设置" data-i18n-title="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
       <button class="btn-primary" id="exportBtn" title="导出预览">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span data-i18n="export">导出</span>
@@ -116,81 +102,23 @@
         <g id="canvasContent"></g>
         <g id="overlay"></g>
       </svg>
-      <div class="canvas-hint" id="canvasHint"></div>
       <div class="canvas-status">
-        <span id="statusText" data-i18n="ready">就绪</span>
+        <span id="statusText"></span>
       </div>
     </main>
-
-    <!-- 右侧工具栏 -->
-    <aside class="right-panel" id="rightPanel">
-      <div class="panel-header">
-        <span class="panel-title" data-i18n="tools">工具</span>
-      </div>
-      <div class="panel-body">
-        <div class="tool-section">
-          <div class="section-label" data-i18n="select">选择</div>
-          <div class="tool-grid">
-            <button class="tool-btn active" data-tool="select" title="选择工具 (V)" data-i18n-title="selectTool">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
-              <span data-i18n="select">选择</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="tool-section">
-          <div class="section-label" data-i18n="station">站点 <span class="hint-text" data-i18n="dragToCanvas">拖拽到画布</span></div>
-          <div class="tool-grid">
-            <div class="tool-card" draggable="true" data-tool="station-normal" title="普通站点" data-i18n-title="normalStation">
-              <div class="tool-icon station-normal-icon">
-                <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="6" fill="currentColor"/></svg>
-              </div>
-              <span data-i18n="normalStation">普通站</span>
-            </div>
-            <div class="tool-card" draggable="true" data-tool="station-interchange" title="换乘站点" data-i18n-title="interchangeStation">
-              <div class="tool-icon station-interchange-icon">
-                <svg viewBox="0 0 40 40">
-                  <circle cx="20" cy="20" r="8" fill="none" stroke="currentColor" stroke-width="3"/>
-                  <circle cx="20" cy="20" r="3" fill="currentColor"/>
-                </svg>
-              </div>
-              <span data-i18n="interchangeStation">换乘站</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="tool-section">
-          <div class="section-label" data-i18n="create">创建</div>
-          <div class="tool-grid">
-            <button class="tool-btn" data-tool="line" title="线路工具 (L)" data-i18n-title="lineTool">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="20" x2="20" y2="4"/><circle cx="4" cy="20" r="2" fill="currentColor"/><circle cx="20" cy="4" r="2" fill="currentColor"/></svg>
-              <span data-i18n="line">线路</span>
-            </button>
-            <button class="tool-btn" data-tool="text" title="文本工具 (T)" data-i18n-title="textTool">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
-              <span data-i18n="text">文本</span>
-            </button>
-          </div>
-        </div>
-
-        
-      </div>
-    </aside>
   </div>
 
   <!-- 导出预览弹窗 -->
   <div class="modal-overlay" id="exportModal">
     <div class="modal">
       <div class="modal-header">
-        <h2>导出预览</h2>
+        <h2 data-i18n="exportPreview">导出预览</h2>
         <button class="btn-icon" id="closeExportBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
       <div class="modal-body">
-        <div class="preview-area" id="previewArea">
-          <!-- 预览内容将在此动态生成 -->
-        </div>
+        <div class="preview-area" id="previewArea"></div>
         <div class="export-sections">
           <!-- 图片下载 -->
           <label class="export-toggle">
@@ -227,6 +155,19 @@
                 <option value="bottom-right" data-i18n="bottomRight">右下角</option>
               </select>
             </div>
+            <div class="prop-group">
+              <label class="prop-label" data-i18n="legendLanguage">图例语言</label>
+              <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:13px;">
+                  <input type="checkbox" id="legendLangCn" checked>
+                  <span data-i18n="legendLangCn">中文</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:13px;">
+                  <input type="checkbox" id="legendLangEn" checked>
+                  <span data-i18n="legendLangEn">英文</span>
+                </label>
+              </div>
+            </div>
           </div>
           <!-- 报站音频下载 -->
           <label class="export-toggle">
@@ -247,21 +188,183 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-primary" id="startDownloadBtn" style="width:100%; justify-content:center;">开始下载</button>
+        <button class="btn-primary" id="startDownloadBtn" style="width:100%; justify-content:center;" data-i18n="startDownload">开始下载</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设置模态窗口 -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal settings-modal">
+      <div class="modal-header">
+        <h2 data-i18n="settings">设置</h2>
+        <button class="btn-icon" id="closeSettingsBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body settings-body">
+        <div class="settings-section">
+          <div class="settings-label" data-i18n="backgroundColor">背景颜色</div>
+          <div class="bg-options">
+            <button class="bg-option" data-bg="white" style="background:#ffffff; border-color:#475569;" title="白色"></button>
+            <button class="bg-option active" data-bg="dark-blue" style="background:#0f172a;" title="深蓝"></button>
+            <button class="bg-option" data-bg="black" style="background:#000000; border-color:#475569;" title="黑色"></button>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-label" data-i18n="grid">网格</div>
+          <label class="switch">
+            <input type="checkbox" id="gridToggle" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+        <div class="settings-section">
+          <div class="settings-label" data-i18n="language">语言</div>
+          <select class="prop-input prop-select" id="languageSelect">
+            <option value="zh" selected>中文</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <div class="settings-section settings-footer">
+          <div class="settings-links">
+            <a href="#" class="settings-link" id="showTermsBtn" data-i18n="termsOfService">服务条款</a>
+            <a href="#" class="settings-link" id="showPrivacyBtn" data-i18n="privacyPolicy">隐私政策</a>
+          </div>
+          <div class="settings-copyright">© 2026 zeenyoung</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 欢迎向导模态窗口 -->
+  <div class="modal-overlay" id="welcomeModal">
+    <div class="modal welcome-modal">
+      <div class="welcome-step" id="welcomeStep1">
+        <div class="welcome-header">
+          <svg class="welcome-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="8" cy="8" r="5"/>
+            <circle cx="8" cy="8" r="2" fill="currentColor"/>
+          </svg>
+          <h2 data-i18n="welcome">欢迎使用地铁线路图绘制工具</h2>
+        </div>
+        <div class="welcome-content">
+          <div class="welcome-section">
+            <div class="welcome-label" data-i18n="chooseLanguage">选择语言</div>
+            <div class="language-options">
+              <button class="lang-option active" data-lang="zh">中文</button>
+              <button class="lang-option" data-lang="en">English</button>
+            </div>
+          </div>
+        </div>
+        <div class="welcome-footer">
+          <button class="btn-primary" id="welcomeNext1" data-i18n="nextStep">下一步</button>
+        </div>
+      </div>
+
+      <div class="welcome-step" id="welcomeStep2" style="display:none;">
+        <div class="welcome-header">
+          <h2 data-i18n="agreementTitle">用户协议</h2>
+        </div>
+        <div class="welcome-content agreement-content">
+          <div class="agreement-scroll" id="agreementText">
+            <h3 data-i18n="termsOfService">服务条款</h3>
+            <p data-i18n="termsText1">欢迎使用地铁线路图绘制工具。在使用本工具之前，请仔细阅读以下服务条款：</p>
+            <p data-i18n="termsText2">1. 本工具为免费工具，您可以自由使用、导出所创建的地铁线路图。</p>
+            <p data-i18n="termsText3">2. 您创建的内容仅保存在本地浏览器中，清除浏览器数据将导致丢失。</p>
+            <p data-i18n="termsText4">3. 本工具不承担因数据丢失、使用不当造成的任何损失。</p>
+            <p data-i18n="termsText5">4. 请勿利用本工具创建违法、违规内容。</p>
+            <h3 data-i18n="privacyPolicy">隐私政策</h3>
+            <p data-i18n="privacyText1">本工具高度重视您的隐私：</p>
+            <p data-i18n="privacyText2">1. 所有数据仅存储在您本地浏览器的 localStorage 中。</p>
+            <p data-i18n="privacyText3">2. 本工具不收集、不上传任何用户数据。</p>
+            <p data-i18n="privacyText4">3. 您导出的图片和音频文件仅在您的设备上生成。</p>
+            <p data-i18n="privacyText5">4. 如需清除数据，请使用浏览器的"清除浏览数据"功能。</p>
+          </div>
+          <div class="agreement-checks">
+            <label class="agreement-item">
+              <input type="checkbox" id="agreeTerms">
+              <span data-i18n="agreeTerms">我已阅读并同意服务条款</span>
+            </label>
+            <label class="agreement-item">
+              <input type="checkbox" id="agreePrivacy">
+              <span data-i18n="agreePrivacy">我已阅读并同意隐私政策</span>
+            </label>
+          </div>
+        </div>
+        <div class="welcome-footer">
+          <button class="btn-ghost" id="welcomeBack2" data-i18n="previousStep">上一步</button>
+          <button class="btn-primary" id="welcomeNext2" disabled data-i18n="nextStep">下一步</button>
+        </div>
+      </div>
+
+      <div class="welcome-step" id="welcomeStep3" style="display:none;">
+        <div class="welcome-header">
+          <h2 data-i18n="themeTitle">选择主题</h2>
+        </div>
+        <div class="welcome-content">
+          <div class="theme-options">
+            <button class="theme-option" data-bg="white">
+              <div class="theme-preview" style="background:#ffffff;"></div>
+              <span data-i18n="themeWhite">白色</span>
+            </button>
+            <button class="theme-option active" data-bg="dark-blue">
+              <div class="theme-preview" style="background:#0f172a;"></div>
+              <span data-i18n="themeDarkBlue">深蓝</span>
+            </button>
+            <button class="theme-option" data-bg="black">
+              <div class="theme-preview" style="background:#000000;"></div>
+              <span data-i18n="themeBlack">黑色</span>
+            </button>
+          </div>
+        </div>
+        <div class="welcome-footer">
+          <button class="btn-ghost" id="welcomeBack3" data-i18n="previousStep">上一步</button>
+          <button class="btn-primary" id="welcomeNext3" data-i18n="nextStep">下一步</button>
+        </div>
+      </div>
+
+      <div class="welcome-step" id="welcomeStep4" style="display:none;">
+        <div class="welcome-header">
+          <h2 data-i18n="guideTitle">操作指南</h2>
+        </div>
+        <div class="welcome-content">
+          <div class="guide-list">
+            <div class="guide-item">
+              <div class="guide-number">1</div>
+              <div class="guide-text" data-i18n="guide1">选择站点工具，点击画布创建站点</div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-number">2</div>
+              <div class="guide-text" data-i18n="guide2">选择线路工具，从站点拖拽经过其他站点创建线路</div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-number">3</div>
+              <div class="guide-text" data-i18n="guide3">拖拽回起点可创建环线，多站点共用即为换乘站</div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-number">4</div>
+              <div class="guide-text" data-i18n="guide4">点击站点或线路，在左侧属性面板编辑名称和颜色</div>
+            </div>
+          </div>
+        </div>
+        <div class="welcome-footer">
+          <button class="btn-primary" id="welcomeStart" data-i18n="startCreating">开始创作</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="js/state.js?v=4"></script>
-<script src="js/geometry.js?v=4"></script>
-<script src="js/settings.js?v=4"></script>
-<script src="js/canvas.js?v=5"></script>
-<script src="js/properties.js?v=4"></script>
-<script src="js/toolbar.js?v=4"></script>
-<script src="js/export.js?v=4"></script>
-<script src="js/app.js?v=4"></script>
+<script src="js/state.js?v=10"></script>
+<script src="js/geometry.js?v=10"></script>
+<script src="js/settings.js?v=10"></script>
+<script src="js/welcome.js?v=10"></script>
+<script src="js/canvas.js?v=10"></script>
+<script src="js/properties.js?v=10"></script>
+<script src="js/toolbar.js?v=10"></script>
+<script src="js/export.js?v=10"></script>
+<script src="js/app.js?v=10"></script>
 
 </body>
 </html>

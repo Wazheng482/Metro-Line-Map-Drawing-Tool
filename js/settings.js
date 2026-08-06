@@ -86,7 +86,53 @@ const Settings = (() => {
       statusTextMode: '文本模式：点击画布添加文本',
       hintLineMode: '按住拖拽经过多个站点',
       hintReconnect: '拖拽经过新站点序列',
-      hintTextMode: '点击画布添加文本框'
+      hintTextMode: '点击画布添加文本框',
+      loopTool: '环线工具 (O)',
+      loop: '环线',
+      statusLoopMode: '环线模式：从站点按下拖拽，经过站点自动连接成环，松开完成',
+      lineType: '线路类型',
+      normalLine: '普通线路',
+      loopLine: '环线',
+      termsOfService: '服务条款',
+      privacyPolicy: '隐私政策',
+      about: '关于',
+      welcome: '欢迎使用地铁线路图绘制工具',
+      chooseLanguage: '选择语言',
+      nextStep: '下一步',
+      previousStep: '上一步',
+      agreementTitle: '用户协议',
+      agreeTerms: '我已阅读并同意服务条款',
+      agreePrivacy: '我已阅读并同意隐私政策',
+      themeTitle: '选择主题',
+      themeWhite: '白色',
+      themeDarkBlue: '深蓝',
+      themeBlack: '黑色',
+      guideTitle: '操作指南',
+      guide1: '从右侧工具栏拖拽站点到画布',
+      guide2: '选择线路工具，从站点拖拽经过其他站点创建线路',
+      guide3: '点击站点或线路，在左侧属性面板编辑名称和颜色',
+      guide4: '使用右上角导出按钮导出图片和音频',
+      startCreating: '开始创作',
+      stationTool: '站点工具 (S)',
+      statusStationMode: '站点模式：点击画布创建站点',
+      statusLineMode: '线路模式：从站点按下拖拽，经过站点自动连接，拖拽回起点形成环线',
+      legendLanguage: '图例语言',
+      legendLangCn: '中文',
+      legendLangEn: '英文',
+      termsText1: '欢迎使用地铁线路图绘制工具。在使用本工具之前，请仔细阅读以下服务条款：',
+      termsText2: '1. 本工具为免费工具，您可以自由使用、导出所创建的地铁线路图。',
+      termsText3: '2. 您创建的内容仅保存在本地浏览器中，清除浏览器数据将导致丢失。',
+      termsText4: '3. 本工具不承担因数据丢失、使用不当造成的任何损失。',
+      termsText5: '4. 请勿利用本工具创建违法、违规内容。',
+      privacyText1: '本工具高度重视您的隐私：',
+      privacyText2: '1. 所有数据仅存储在您本地浏览器的 localStorage 中。',
+      privacyText3: '2. 本工具不收集、不上传任何用户数据。',
+      privacyText4: '3. 您导出的图片和音频文件仅在您的设备上生成。',
+      privacyText5: '4. 如需清除数据，请使用浏览器的"清除浏览数据"功能。',
+      guide1: '选择站点工具，点击画布创建站点',
+      guide2: '选择线路工具，从站点拖拽经过其他站点创建线路',
+      guide3: '拖拽回起点可创建环线，多站点共用即为换乘站',
+      guide4: '点击站点或线路，在左侧属性面板编辑名称和颜色'
     },
     en: {
       export: 'Export',
@@ -174,7 +220,53 @@ const Settings = (() => {
       statusTextMode: 'Text mode: click canvas to add text',
       hintLineMode: 'Hold and drag through multiple stations',
       hintReconnect: 'Drag through new station sequence',
-      hintTextMode: 'Click canvas to add text box'
+      hintTextMode: 'Click canvas to add text box',
+      loopTool: 'Loop Line Tool (O)',
+      loop: 'Loop',
+      statusLoopMode: 'Loop mode: drag from station through stations to form a loop, release to finish',
+      lineType: 'Line Type',
+      normalLine: 'Normal Line',
+      loopLine: 'Loop Line',
+      termsOfService: 'Terms of Service',
+      privacyPolicy: 'Privacy Policy',
+      about: 'About',
+      welcome: 'Welcome to Metro Line Map Drawing Tool',
+      chooseLanguage: 'Choose Language',
+      nextStep: 'Next',
+      previousStep: 'Previous',
+      agreementTitle: 'User Agreement',
+      agreeTerms: 'I have read and agree to the Terms of Service',
+      agreePrivacy: 'I have read and agree to the Privacy Policy',
+      themeTitle: 'Choose Theme',
+      themeWhite: 'White',
+      themeDarkBlue: 'Dark Blue',
+      themeBlack: 'Black',
+      guideTitle: 'Quick Guide',
+      guide1: 'Drag stations from the right toolbar to the canvas',
+      guide2: 'Select line tool, drag from station through other stations to create line',
+      guide3: 'Click station or line, edit name and color in the left panel',
+      guide4: 'Use the export button on the top right to export image and audio',
+      startCreating: 'Start Creating',
+      stationTool: 'Station Tool (S)',
+      statusStationMode: 'Station mode: click canvas to create station',
+      statusLineMode: 'Line mode: drag from station through stations to connect, drag back to start to form loop',
+      legendLanguage: 'Legend Language',
+      legendLangCn: 'Chinese',
+      legendLangEn: 'English',
+      termsText1: 'Welcome to Metro Line Map Drawing Tool. Please read the following terms carefully before using this tool:',
+      termsText2: '1. This tool is free. You can freely use and export the metro maps you create.',
+      termsText3: '2. Your creations are stored only in your local browser. Clearing browser data will lose them.',
+      termsText4: '3. This tool is not responsible for any loss caused by data loss or misuse.',
+      termsText5: '4. Do not use this tool to create illegal or violating content.',
+      privacyText1: 'This tool values your privacy highly:',
+      privacyText2: '1. All data is stored only in your browser\'s localStorage.',
+      privacyText3: '2. This tool does not collect or upload any user data.',
+      privacyText4: '3. The images and audio you export are generated only on your device.',
+      privacyText5: '4. To clear data, use your browser\'s "Clear Browsing Data" function.',
+      guide1: 'Select station tool, click canvas to create station',
+      guide2: 'Select line tool, drag from station through other stations to create line',
+      guide3: 'Drag back to start to form a loop. Shared stations become interchange stations',
+      guide4: 'Click station or line, edit name and color in the left panel'
     }
   };
 
@@ -240,16 +332,20 @@ const Settings = (() => {
 
   function bindSettingsEvents() {
     const settingsBtn = document.getElementById('settingsBtn');
-    const dropdown = document.getElementById('settingsDropdown');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
 
-    settingsBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      dropdown.classList.toggle('show');
+    settingsBtn.addEventListener('click', () => {
+      settingsModal.classList.add('show');
     });
 
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target) && !settingsBtn.contains(e.target)) {
-        dropdown.classList.remove('show');
+    closeSettingsBtn.addEventListener('click', () => {
+      settingsModal.classList.remove('show');
+    });
+
+    settingsModal.addEventListener('click', (e) => {
+      if (e.target === settingsModal) {
+        settingsModal.classList.remove('show');
       }
     });
 
@@ -365,7 +461,7 @@ const Settings = (() => {
     const t = translations[currentLang];
     document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
 
-    document.title = currentLang === 'zh' ? '地铁线路图绘制工具' : 'Metro Line Map Drawing Tool';
+    document.title = currentLang === 'zh' ? '地铁线路图绘制工具-Metro Line Map Drawing Tool' : 'Metro Line Map Drawing Tool-地铁线路图绘制工具';
 
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
@@ -422,5 +518,20 @@ const Settings = (() => {
     return translations[currentLang][key] || key;
   }
 
-  return { init, getCurrentLang, t };
+  function applyLang(lang) {
+    currentLang = lang;
+    saveSettings();
+    applyLanguage();
+  }
+
+  function applyBg(bg) {
+    currentBg = bg;
+    document.querySelectorAll('.bg-option').forEach(b => {
+      b.classList.toggle('active', b.dataset.bg === bg);
+    });
+    saveSettings();
+    applyBackground();
+  }
+
+  return { init, getCurrentLang, t, applyLang, applyBg };
 })();

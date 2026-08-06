@@ -3,6 +3,7 @@ const Geometry = (() => {
 
   /**
    * 生成仅使用 0°/45°/90° 角度的折线路径
+   * 真实地铁线路风格：先走45°斜线，再走直线（水平或垂直）
    * @param {number} x1 起点 X
    * @param {number} y1 起点 Y
    * @param {number} x2 终点 X
@@ -33,53 +34,28 @@ const Geometry = (() => {
 
     let points;
 
+    // 真实地铁线路风格：先走45°斜线，再走直线
+    // 斜线段长度 = min(absDx, absDy)，剩余部分为直线
+    const diagonalLen = Math.min(absDx, absDy);
+    
+    // 斜线终点：从起点走 diagonalLen 的45°斜线
+    const midX = x1 + signX * diagonalLen;
+    const midY = y1 + signY * diagonalLen;
+
     if (absDx >= absDy) {
-      // 水平优先：水平 → 45° → 水平
-      const h1 = (absDx - absDy) / 2;
-
-      const p1 = { x: x1 + signX * h1, y: y1 };
-      const p2 = { x: x1 + signX * (h1 + absDy), y: y2 };
-      // 验证: p2.x = x1 + signX*(h1 + absDy) = x1 + signX*((absDx-absDy)/2 + absDy)
-      //       = x1 + signX*((absDx+absDy)/2)
-      // 由于 absDx >= absDy, h1+absDy >= h1, 这是正确的
-      const p3 = { x: x2, y: y2 };
-
+      // 水平方向更长：斜线后走水平直线
       points = [
         { x: x1, y: y1 },
-        p1,
-        p2,
-        p3
+        { x: midX, y: midY },
+        { x: x2, y: midY }
       ];
-
-      // 如果 h1 = 0，第一段和第二段起点重合，去掉重复点
-      if (h1 < 0.5) {
-        points = [{ x: x1, y: y1 }, p2, p3];
-      }
-      // 如果 h2 = 0 (即 absDx = absDy)，第三段退化，p2 = p3
-      if (Math.abs(p2.x - p3.x) < 1 && Math.abs(p2.y - p3.y) < 1) {
-        points = [{ x: x1, y: y1 }, p1, p2];
-      }
     } else {
-      // 垂直优先：垂直 → 45° → 垂直
-      const v1 = (absDy - absDx) / 2;
-
-      const p1 = { x: x1, y: y1 + signY * v1 };
-      const p2 = { x: x2, y: y1 + signY * (v1 + absDx) };
-      const p3 = { x: x2, y: y2 };
-
+      // 垂直方向更长：斜线后走垂直直线
       points = [
         { x: x1, y: y1 },
-        p1,
-        p2,
-        p3
+        { x: midX, y: midY },
+        { x: midX, y: y2 }
       ];
-
-      if (v1 < 0.5) {
-        points = [{ x: x1, y: y1 }, p2, p3];
-      }
-      if (Math.abs(p2.x - p3.x) < 1 && Math.abs(p2.y - p3.y) < 1) {
-        points = [{ x: x1, y: y1 }, p1, p2];
-      }
     }
 
     // 简化路径（移除太近的点）

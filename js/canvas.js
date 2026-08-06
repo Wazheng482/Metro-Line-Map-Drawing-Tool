@@ -83,12 +83,13 @@ const Canvas = (() => {
       if (state.selectedTool === 'line') {
         // 线路工具下拖拽空白 = 平移地图
         startPan(e);
+      } else if (state.selectedTool === 'station') {
+        // 站点工具：点击空白处创建站点
+        State.addStation(point.x, point.y);
       } else if (state.selectedTool === 'select') {
         // 选择工具下拖拽空白 = 平移地图；点击（不拖拽）= 取消选中
         startPan(e);
         panClickPending = true;
-      } else {
-        handleBackgroundClick(point, state);
       }
     }
   }
@@ -103,12 +104,6 @@ const Canvas = (() => {
   function handleBackgroundClick(point, state) {
     const tool = state.selectedTool;
 
-    if (tool === 'text') {
-      State.addTextBlock(point.x, point.y);
-      State.setTool('select');
-      return;
-    }
-
     if (tool === 'line') {
       return;
     }
@@ -118,7 +113,6 @@ const Canvas = (() => {
     if (isPanning) {
       panMoved = true;
       panClickPending = false;
-      // 直接更新本地变量，不触发 notify/renderAll，保证流畅
       offset.x = e.clientX - panStart.x;
       offset.y = e.clientY - panStart.y;
       applyTransform();
@@ -130,13 +124,11 @@ const Canvas = (() => {
       return;
     }
 
-    // 连续拖拽连线预览
     if (lineDragState) {
       updateLineDragPreview(e);
       return;
     }
 
-    // 线路工具下悬停高亮
     const state = State.getState();
     if (state.selectedTool === 'line') {
       updateHoverStation(e);
@@ -177,7 +169,6 @@ const Canvas = (() => {
     const point = getCanvasPoint(e.clientX, e.clientY);
     const state = State.getState();
 
-    // 松开时如果悬停在站点上，加入序列
     const hoverStation = Geometry.findNearestStation(point.x, point.y, state.stations, 30);
     if (hoverStation && !lineDragState.stationIds.includes(hoverStation.id)) {
       if (!lineDragState.isExtending || !lineDragState.existingStationIds.includes(hoverStation.id)) {
@@ -185,21 +176,27 @@ const Canvas = (() => {
       }
     }
 
+    // 自动检测环线：如果最后一个站点回到了起点
+    const isLoop = hoverStation && 
+                   lineDragState.stationIds.length >= 2 && 
+                   hoverStation.id === lineDragState.stationIds[0];
+
     if (lineDragState.stationIds.length >= 2) {
       if (lineDragState.isReconnecting) {
-        // 重新连接：替换线路的站点序列
-        State.updateLine(lineDragState.reconnectLineId, { stationIds: [...lineDragState.stationIds] });
+        State.updateLine(lineDragState.reconnectLineId, { 
+          stationIds: [...lineDragState.stationIds],
+          isLoop 
+        });
         State.setReconnectingLine(null);
         State.setTool('select');
       } else if (lineDragState.isExtending) {
-        // 延伸已有线路：去掉起点（已在原线路中）
         const newStations = lineDragState.stationIds.slice(1);
         if (newStations.length > 0) {
           const toAdd = lineDragState.extendAtStart ? newStations.reverse() : newStations;
           State.appendStationsToLine(lineDragState.extendLineId, toAdd, lineDragState.extendAtStart);
         }
       } else {
-        State.addLineWithStations(lineDragState.stationIds);
+        State.addLineWithStations(lineDragState.stationIds, { isLoop });
       }
     }
 
@@ -214,29 +211,40 @@ const Canvas = (() => {
     const state = State.getState();
     const hoverStation = Geometry.findNearestStation(point.x, point.y, state.stations, 30);
 
-    // 经过新站点时自动固定
     if (hoverStation && !lineDragState.stationIds.includes(hoverStation.id)) {
       if (!lineDragState.isExtending || !lineDragState.existingStationIds.includes(hoverStation.id)) {
         lineDragState.stationIds.push(hoverStation.id);
       }
     }
 
-    // 悬停高亮（仅高亮还未固定的站点）
-    const newHoverId = (hoverStation && !lineDragState.stationIds.includes(hoverStation.id)) ? hoverStation.id : null;
+    // 自动检测环线：悬停在起点时，显示闭环预览
+    const isLoopingBack = hoverStation && 
+                          lineDragState.stationIds.length >= 2 && 
+                          hoverStation.id === lineDragState.stationIds[0];
+
+    let newHoverId = null;
+    if (hoverStation) {
+      if (!lineDragState.stationIds.includes(hoverStation.id) || isLoopingBack) {
+        newHoverId = hoverStation.id;
+      }
+    }
     if (newHoverId !== hoverStationId) {
       hoverStationId = newHoverId;
       renderAll();
     }
 
-    // 构建预览路径：所有已固定站点 + 当前鼠标位置
     const stationPoints = lineDragState.stationIds.map(id => {
       const s = state.stations.find(st => st.id === id);
       return s ? { x: s.x, y: s.y } : null;
     }).filter(Boolean);
 
-    const targetX = hoverStation && !lineDragState.stationIds.includes(hoverStation.id) ? hoverStation.x : point.x;
-    const targetY = hoverStation && !lineDragState.stationIds.includes(hoverStation.id) ? hoverStation.y : point.y;
-    stationPoints.push({ x: targetX, y: targetY });
+    if (isLoopingBack && stationPoints.length > 0) {
+      stationPoints.push({ x: stationPoints[0].x, y: stationPoints[0].y });
+    } else {
+      const targetX = hoverStation && !lineDragState.stationIds.includes(hoverStation.id) ? hoverStation.x : point.x;
+      const targetY = hoverStation && !lineDragState.stationIds.includes(hoverStation.id) ? hoverStation.y : point.y;
+      stationPoints.push({ x: targetX, y: targetY });
+    }
 
     showMultiSegmentPreview(stationPoints);
   }
@@ -286,10 +294,8 @@ const Canvas = (() => {
 
     const point = getCanvasPoint(e.clientX, e.clientY);
     
-    if (tool === 'station-normal') {
-      State.addStation(point.x, point.y, 'normal');
-    } else if (tool === 'station-interchange') {
-      State.addStation(point.x, point.y, 'interchange');
+    if (tool === 'station' || tool === 'station-normal') {
+      State.addStation(point.x, point.y);
     }
   }
 
@@ -386,27 +392,29 @@ const Canvas = (() => {
     g.setAttribute('data-id', station.id);
     g.setAttribute('data-type', 'station');
 
-    // 站点图形
+    // 站点图形 - 根据站点被引用的线路数量自动判断换乘
+    const linesReferencing = state.lines.filter(l => l.stationIds.includes(station.id));
+    const isTransfer = linesReferencing.length > 1;
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('class', 'station-circle');
     circle.setAttribute('cx', station.x);
     circle.setAttribute('cy', station.y);
-    circle.setAttribute('r', station.type === 'interchange' ? 10 : 7);
+    circle.setAttribute('r', isTransfer ? 10 : 7);
     
-    if (station.type === 'interchange') {
-      circle.setAttribute('fill', '#0f172a');
-      circle.setAttribute('stroke', '#f1f5f9');
+    if (isTransfer) {
+      circle.setAttribute('fill', '#f1f5f9');
+      circle.setAttribute('stroke', '#0f172a');
       circle.setAttribute('stroke-width', '3');
       
       const innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       innerCircle.setAttribute('cx', station.x);
       innerCircle.setAttribute('cy', station.y);
       innerCircle.setAttribute('r', 4);
-      innerCircle.setAttribute('fill', '#f1f5f9');
+      innerCircle.setAttribute('fill', '#0f172a');
       g.appendChild(innerCircle);
     } else {
-      circle.setAttribute('fill', '#f1f5f9');
-      circle.setAttribute('stroke', '#0f172a');
+      circle.setAttribute('fill', '#0f172a');
+      circle.setAttribute('stroke', '#f1f5f9');
       circle.setAttribute('stroke-width', '2');
     }
     g.appendChild(circle);
@@ -448,20 +456,18 @@ const Canvas = (() => {
 
     const state = State.getState();
     
-    // 线路工具：从站点开始连续拖拽连接
     if (state.selectedTool === 'line') {
-      // 重新连接模式：直接开始拖拽，不检查端点
       if (state.reconnectingLineId) {
         lineDragState = {
           stationIds: [station.id],
           isExtending: false,
           isReconnecting: true,
-          reconnectLineId: state.reconnectingLineId
+          reconnectLineId: state.reconnectingLineId,
+          tool: 'line'
         };
         return;
       }
 
-      // 检查是否从选中线路的端点延伸
       let isExtending = false;
       let extendLineId = null;
       let extendAtStart = false;
@@ -489,7 +495,8 @@ const Canvas = (() => {
         isExtending,
         extendLineId,
         extendAtStart,
-        existingStationIds
+        existingStationIds,
+        tool: 'line'
       };
       return;
     }
@@ -557,7 +564,9 @@ const Canvas = (() => {
     const stations = line.stationIds.map(id => state.stations.find(s => s.id === id)).filter(Boolean);
     if (stations.length < 2) return;
 
-    const points = Geometry.generateMultiStationPath(stations);
+    // 环线：首尾相连，把第一个站点加到末尾
+    const pathStations = line.isLoop ? [...stations, stations[0]] : stations;
+    const points = Geometry.generateMultiStationPath(pathStations);
     const pathData = Geometry.pointsToPathData(points);
     const isSelected = state.selectedElement?.type === 'line' && state.selectedElement.id === line.id;
 
@@ -663,24 +672,15 @@ const Canvas = (() => {
   // ========== 状态提示 ==========
   function updateStatus(state) {
     const statusEl = document.getElementById('statusText');
-    const hintEl = document.getElementById('canvasHint');
-    
-    if (state.selectedTool === 'line') {
-      if (state.reconnectingLineId) {
-        statusEl.textContent = Settings.t('statusReconnect');
-        hintEl.textContent = Settings.t('hintReconnect');
-      } else {
-        statusEl.textContent = Settings.t('statusLineMode');
-        hintEl.textContent = Settings.t('hintLineMode');
-      }
-      hintEl.classList.add('show');
-    } else if (state.selectedTool === 'text') {
-      statusEl.textContent = Settings.t('statusTextMode');
-      hintEl.textContent = Settings.t('hintTextMode');
-      hintEl.classList.add('show');
+    const hintMap = {
+      line: Settings.t('statusLineMode'),
+      station: Settings.t('statusStationMode')
+    };
+    const hint = hintMap[state.selectedTool];
+    if (hint) {
+      statusEl.textContent = hint;
     } else {
-      statusEl.textContent = `${Settings.t('stations')}: ${state.stations.length}  |  ${Settings.t('lines')}: ${state.lines.length}  |  ${Settings.t('texts')}: ${state.textBlocks.length}`;
-      hintEl.classList.remove('show');
+      statusEl.textContent = `${Settings.t('stations')}: ${state.stations.length}  |  ${Settings.t('lines')}: ${state.lines.length}`;
     }
   }
 

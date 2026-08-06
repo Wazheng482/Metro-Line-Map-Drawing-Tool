@@ -9,6 +9,7 @@ function init() {
   Toolbar.init();
   Export.init();
   Settings.init();
+  Welcome.init();
   setupGlobalEvents();
   updateZoomDisplay();
 }
@@ -42,14 +43,14 @@ function setupGlobalEvents() {
       State.setTool('select');
     }
     
+    // S - 站点工具
+    if (e.key === 's' || e.key === 'S') {
+      if (!e.ctrlKey && !e.metaKey) State.setTool('station');
+    }
+    
     // L - 线路工具
     if (e.key === 'l' || e.key === 'L') {
       State.setTool('line');
-    }
-    
-    // T - 文本工具
-    if (e.key === 't' || e.key === 'T') {
-      State.setTool('text');
     }
     
     // Escape - 取消当前操作

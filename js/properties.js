@@ -100,10 +100,16 @@ const Properties = (() => {
     const bVal = document.getElementById(`${idPrefix}BVal`);
     const hexInput = document.getElementById(`${idPrefix}Hex`);
     const preview = document.getElementById(`${idPrefix}Preview`);
+    const sliderGroup = preview.closest('.rgb-slider-group');
 
     function updateFromRgb() {
       const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
       preview.style.background = hex;
+      preview.style.borderColor = hex;
+      if (sliderGroup) {
+        sliderGroup.style.background = hex + '33';
+        sliderGroup.style.borderColor = hex;
+      }
       hexInput.value = hex;
       skipRender = true;
       onChange(hex);
@@ -137,25 +143,36 @@ const Properties = (() => {
         gVal.textContent = rgb.g;
         bVal.textContent = rgb.b;
         preview.style.background = val;
+        preview.style.borderColor = val;
+        if (sliderGroup) {
+          sliderGroup.style.background = val + '33';
+          sliderGroup.style.borderColor = val;
+        }
         skipRender = true;
         onChange(val);
         skipRender = false;
       }
     });
+    
+    // 初始化背景色
+    updateFromRgb();
   }
 
   function renderStationProps(station) {
     const positions = [
-      { key: 'top-left', icon: '↖' },
-      { key: 'top', icon: '↑' },
-      { key: 'top-right', icon: '↗' },
-      { key: 'left', icon: '←' },
-      { key: '', icon: '' },
-      { key: 'right', icon: '→' },
-      { key: 'bottom-left', icon: '↙' },
-      { key: 'bottom', icon: '↓' },
-      { key: 'bottom-right', icon: '↘' }
+      { key: 'top-left', label: '↖', text: '左上' },
+      { key: 'top', label: '↑', text: '上' },
+      { key: 'top-right', label: '↗', text: '右上' },
+      { key: 'left', label: '←', text: '左' },
+      { key: 'center', label: '●', text: '中' },
+      { key: 'right', label: '→', text: '右' },
+      { key: 'bottom-left', label: '↙', text: '左下' },
+      { key: 'bottom', label: '↓', text: '下' },
+      { key: 'bottom-right', label: '↘', text: '右下' }
     ];
+
+    // 计算默认位置
+    const currentPos = station.labelPosition || 'right';
 
     panel.innerHTML = `
       <div class="prop-form">
@@ -168,21 +185,12 @@ const Properties = (() => {
           <input type="text" class="prop-input" id="stationNameEn" value="${escapeHtml(station.nameEn || '')}" placeholder="Station Name">
         </div>
         <div class="prop-group">
-          <label class="prop-label">${Settings.t('stationType')}</label>
-          <select class="prop-input prop-select" id="stationType">
-            <option value="normal" ${station.type === 'normal' ? 'selected' : ''}>${Settings.t('normalStationFull')}</option>
-            <option value="interchange" ${station.type === 'interchange' ? 'selected' : ''}>${Settings.t('interchangeStationFull')}</option>
-          </select>
-        </div>
-        <div class="prop-group">
           <label class="prop-label">${Settings.t('labelPosition')}</label>
-          <div class="position-grid" id="positionGrid">
-            ${positions.map(p => p.key ? `
-              <button class="position-btn ${station.labelPosition === p.key ? 'active' : ''}" data-position="${p.key}" title="${p.key}">
-                ${p.icon}
-              </button>
-            ` : '<div class="position-btn empty"></div>').join('')}
-          </div>
+          <select class="prop-input prop-select" id="labelPosition">
+            ${positions.map(p => `
+              <option value="${p.key}" ${currentPos === p.key ? 'selected' : ''}>${p.text}</option>
+            `).join('')}
+          </select>
         </div>
         <div class="prop-group">
           <button class="btn-ghost" id="deleteStationBtn" style="width:100%; justify-content:center;">
@@ -211,14 +219,8 @@ const Properties = (() => {
       State.pushHistory();
     });
 
-    document.getElementById('stationType').addEventListener('change', (e) => {
-      State.updateStation(station.id, { type: e.target.value });
-    });
-
-    document.querySelectorAll('#positionGrid .position-btn:not(.empty)').forEach(btn => {
-      btn.addEventListener('click', () => {
-        State.updateStation(station.id, { labelPosition: btn.dataset.position });
-      });
+    document.getElementById('labelPosition').addEventListener('change', (e) => {
+      State.updateStation(station.id, { labelPosition: e.target.value });
     });
 
     document.getElementById('deleteStationBtn').addEventListener('click', () => {
@@ -246,8 +248,9 @@ const Properties = (() => {
         <div class="prop-group">
           <label class="prop-label">${Settings.t('stationInfo')}</label>
           <div style="font-size:12px; color:var(--text-muted); padding:8px; background:var(--bg-primary); border-radius:6px;">
-            <div>${Settings.t('stationCount')}: ${line.stationIds.length}</div>
-            <div style="margin-top:4px; line-height:1.6;">${Settings.t('passThrough')}: ${line.stationIds.map(id => getStationName(id)).join(' → ')}</div>
+            <div>${Settings.t('lineType')}: ${line.isLoop ? Settings.t('loopLine') : Settings.t('normalLine')}</div>
+            <div style="margin-top:4px;">${Settings.t('stationCount')}: ${line.stationIds.length}</div>
+            <div style="margin-top:4px; line-height:1.6;">${Settings.t('passThrough')}: ${line.stationIds.map(id => getStationName(id)).join(' → ')}${line.isLoop ? ' → ' + getStationName(line.stationIds[0]) : ''}</div>
           </div>
         </div>
         <div class="prop-group">

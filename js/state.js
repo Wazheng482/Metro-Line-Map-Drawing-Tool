@@ -6,7 +6,7 @@ const State = (() => {
     stations: [],
     lines: [],
     textBlocks: [],
-    selectedTool: 'select', // select | line | text
+    selectedTool: 'select', // select | station | line
     selectedElement: null, // { type: 'station'|'line'|'text', id: string }
     connectingFrom: null, // 线路连接模式：从哪个站点开始
     reconnectingLineId: null, // 重新连接模式的线路ID
@@ -78,14 +78,13 @@ const State = (() => {
   }
 
   // 站点操作
-  function addStation(x, y, type = 'normal') {
+  function addStation(x, y) {
     const station = {
       id: generateId('station'),
       x, y,
       name: `站点${state.stations.length + 1}`,
       nameEn: '',
-      labelPosition: 'top',
-      type
+      labelPosition: 'right'
     };
     state.stations.push(station);
     state.selectedElement = { type: 'station', id: station.id };
@@ -124,10 +123,11 @@ const State = (() => {
     const to = state.stations.find(s => s.id === toId);
     if (!from || !to) return null;
 
+    const lineNum = state.lines.length + 1;
     const line = {
       id: generateId('line'),
-      name: `线路${state.lines.length + 1}`,
-      nameEn: '',
+      name: `线路${lineNum}`,
+      nameEn: `Line ${lineNum}`,
       color: '#E53935',
       stationIds: [fromId, toId]
     };
@@ -170,14 +170,16 @@ const State = (() => {
   }
 
   // 创建包含多个站点的新线路
-  function addLineWithStations(stationIds) {
+  function addLineWithStations(stationIds, options = {}) {
     if (!stationIds || stationIds.length < 2) return null;
+    const lineNum = state.lines.length + 1;
     const line = {
       id: generateId('line'),
-      name: `线路${state.lines.length + 1}`,
-      nameEn: '',
-      color: '#E53935',
-      stationIds: [...stationIds]
+      name: `线路${lineNum}`,
+      nameEn: `Line ${lineNum}`,
+      color: options.color || '#E53935',
+      stationIds: [...stationIds],
+      isLoop: options.isLoop || false
     };
     state.lines.push(line);
     state.selectedElement = { type: 'line', id: line.id };
