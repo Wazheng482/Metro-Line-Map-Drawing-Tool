@@ -23,7 +23,7 @@ const Properties = (() => {
             <line x1="12" y1="8" x2="12" y2="12"/>
             <line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
-          <p>选择画布中的元素以编辑属性</p>
+          <p>${Settings.t('chooseElement')}</p>
         </div>
       `;
       return;
@@ -160,22 +160,22 @@ const Properties = (() => {
     panel.innerHTML = `
       <div class="prop-form">
         <div class="prop-group">
-          <label class="prop-label">站点名称（中文）</label>
-          <input type="text" class="prop-input" id="stationName" value="${escapeHtml(station.name)}" placeholder="输入站点名称">
+          <label class="prop-label">${Settings.t('stationNameCn')}</label>
+          <input type="text" class="prop-input" id="stationName" value="${escapeHtml(station.name)}" placeholder="${Settings.t('enterStationName')}">
         </div>
         <div class="prop-group">
-          <label class="prop-label">站点名称（英文）</label>
+          <label class="prop-label">${Settings.t('stationNameEn')}</label>
           <input type="text" class="prop-input" id="stationNameEn" value="${escapeHtml(station.nameEn || '')}" placeholder="Station Name">
         </div>
         <div class="prop-group">
-          <label class="prop-label">站点类型</label>
+          <label class="prop-label">${Settings.t('stationType')}</label>
           <select class="prop-input prop-select" id="stationType">
-            <option value="normal" ${station.type === 'normal' ? 'selected' : ''}>普通站点</option>
-            <option value="interchange" ${station.type === 'interchange' ? 'selected' : ''}>换乘站点</option>
+            <option value="normal" ${station.type === 'normal' ? 'selected' : ''}>${Settings.t('normalStationFull')}</option>
+            <option value="interchange" ${station.type === 'interchange' ? 'selected' : ''}>${Settings.t('interchangeStationFull')}</option>
           </select>
         </div>
         <div class="prop-group">
-          <label class="prop-label">标签位置</label>
+          <label class="prop-label">${Settings.t('labelPosition')}</label>
           <div class="position-grid" id="positionGrid">
             ${positions.map(p => p.key ? `
               <button class="position-btn ${station.labelPosition === p.key ? 'active' : ''}" data-position="${p.key}" title="${p.key}">
@@ -187,7 +187,7 @@ const Properties = (() => {
         <div class="prop-group">
           <button class="btn-ghost" id="deleteStationBtn" style="width:100%; justify-content:center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            删除站点
+            ${Settings.t('deleteStation')}
           </button>
         </div>
       </div>
@@ -230,36 +230,36 @@ const Properties = (() => {
     panel.innerHTML = `
       <div class="prop-form">
         <div class="prop-group">
-          <label class="prop-label">线路名称（中文）</label>
-          <input type="text" class="prop-input" id="lineName" value="${escapeHtml(line.name)}" placeholder="输入线路名称">
+          <label class="prop-label">${Settings.t('lineNameCn')}</label>
+          <input type="text" class="prop-input" id="lineName" value="${escapeHtml(line.name)}" placeholder="${Settings.t('enterLineName')}">
         </div>
         <div class="prop-group">
-          <label class="prop-label">线路名称（英文）</label>
+          <label class="prop-label">${Settings.t('lineNameEn')}</label>
           <input type="text" class="prop-input" id="lineNameEn" value="${escapeHtml(line.nameEn || '')}" placeholder="Line Name">
         </div>
         <div class="prop-group">
-          <label class="prop-label">线路颜色</label>
+          <label class="prop-label">${Settings.t('lineColor')}</label>
           ${renderColorSlider(line.color, 'lineColor', (hex) => {
             State.updateLine(line.id, { color: hex });
           })}
         </div>
         <div class="prop-group">
-          <label class="prop-label">线路信息</label>
+          <label class="prop-label">${Settings.t('stationInfo')}</label>
           <div style="font-size:12px; color:var(--text-muted); padding:8px; background:var(--bg-primary); border-radius:6px;">
-            <div>站点数: ${line.stationIds.length}</div>
-            <div style="margin-top:4px; line-height:1.6;">途经: ${line.stationIds.map(id => getStationName(id)).join(' → ')}</div>
+            <div>${Settings.t('stationCount')}: ${line.stationIds.length}</div>
+            <div style="margin-top:4px; line-height:1.6;">${Settings.t('passThrough')}: ${line.stationIds.map(id => getStationName(id)).join(' → ')}</div>
           </div>
         </div>
         <div class="prop-group">
           <button class="btn-ghost" id="reconnectLineBtn" style="width:100%; justify-content:center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            重新连接
+            ${Settings.t('reconnectLine')}
           </button>
         </div>
         <div class="prop-group">
           <button class="btn-ghost" id="deleteLineBtn" style="width:100%; justify-content:center; color:var(--danger);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            删除线路
+            ${Settings.t('deleteLine')}
           </button>
         </div>
       </div>
@@ -304,30 +304,30 @@ const Properties = (() => {
     panel.innerHTML = `
       <div class="prop-form">
         <div class="prop-group">
-          <label class="prop-label">文本内容</label>
-          <input type="text" class="prop-input" id="textContent" value="${escapeHtml(tb.content)}" placeholder="输入文本">
+          <label class="prop-label">${Settings.t('textContent')}</label>
+          <input type="text" class="prop-input" id="textContent" value="${escapeHtml(tb.content)}" placeholder="${Settings.t('enterText')}">
         </div>
         <div class="prop-group">
-          <label class="prop-label">字体</label>
+          <label class="prop-label">${Settings.t('fontFamily')}</label>
           <select class="prop-input prop-select" id="textFont">
-            <option value="Microsoft YaHei" ${tb.fontFamily === 'Microsoft YaHei' ? 'selected' : ''}>微软雅黑</option>
-            <option value="SimSun" ${tb.fontFamily === 'SimSun' ? 'selected' : ''}>宋体</option>
-            <option value="KaiTi" ${tb.fontFamily === 'KaiTi' ? 'selected' : ''}>楷体</option>
-            <option value="FangSong" ${tb.fontFamily === 'FangSong' ? 'selected' : ''}>仿宋</option>
-            <option value="SimHei" ${tb.fontFamily === 'SimHei' ? 'selected' : ''}>黑体</option>
-            <option value="sans-serif" ${tb.fontFamily === 'sans-serif' ? 'selected' : ''}>无衬线</option>
-            <option value="serif" ${tb.fontFamily === 'serif' ? 'selected' : ''}>衬线体</option>
+            <option value="Microsoft YaHei" ${tb.fontFamily === 'Microsoft YaHei' ? 'selected' : ''}>${Settings.t('fontYaHei')}</option>
+            <option value="SimSun" ${tb.fontFamily === 'SimSun' ? 'selected' : ''}>${Settings.t('fontSimSun')}</option>
+            <option value="KaiTi" ${tb.fontFamily === 'KaiTi' ? 'selected' : ''}>${Settings.t('fontKaiTi')}</option>
+            <option value="FangSong" ${tb.fontFamily === 'FangSong' ? 'selected' : ''}>${Settings.t('fontFangSong')}</option>
+            <option value="SimHei" ${tb.fontFamily === 'SimHei' ? 'selected' : ''}>${Settings.t('fontSimHei')}</option>
+            <option value="sans-serif" ${tb.fontFamily === 'sans-serif' ? 'selected' : ''}>${Settings.t('fontSansSerif')}</option>
+            <option value="serif" ${tb.fontFamily === 'serif' ? 'selected' : ''}>${Settings.t('fontSerif')}</option>
           </select>
         </div>
         <div class="prop-group">
-          <label class="prop-label">字体大小</label>
+          <label class="prop-label">${Settings.t('fontSize')}</label>
           <div class="font-size-row">
             <input type="range" min="10" max="48" value="${tb.fontSize}" id="fontSize">
             <span class="font-size-value" id="fontSizeValue">${tb.fontSize}</span>
           </div>
         </div>
         <div class="prop-group">
-          <label class="prop-label">颜色</label>
+          <label class="prop-label">${Settings.t('textColor')}</label>
           ${renderColorSlider(tb.color, 'textColor', (hex) => {
             State.updateTextBlock(tb.id, { color: hex });
           })}
@@ -335,7 +335,7 @@ const Properties = (() => {
         <div class="prop-group">
           <button class="btn-ghost" id="deleteTextBtn" style="width:100%; justify-content:center; color:var(--danger);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            删除文本
+            ${Settings.t('deleteText')}
           </button>
         </div>
       </div>
@@ -381,7 +381,7 @@ const Properties = (() => {
   function getStationName(stationId) {
     const state = State.getState();
     const station = state.stations.find(s => s.id === stationId);
-    return station ? station.name : '未知';
+    return station ? station.name : Settings.t('unknown');
   }
 
   function escapeHtml(str) {
@@ -390,5 +390,5 @@ const Properties = (() => {
     return div.innerHTML;
   }
 
-  return { init };
+  return { init, render };
 })();

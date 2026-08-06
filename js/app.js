@@ -4,11 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function init() {
-  Settings.init();
   Canvas.init();
   Properties.init();
   Toolbar.init();
   Export.init();
+  Settings.init();
   setupGlobalEvents();
   updateZoomDisplay();
 }
@@ -82,9 +82,16 @@ function setupGlobalEvents() {
     State.setOffset(0, 0);
   });
 
-  // 左侧面板折叠
+  // 左侧面板折叠/展开
+  const leftPanel = document.getElementById('leftPanel');
+  const expandLeftBtn = document.getElementById('expandLeftBtn');
   document.getElementById('collapseLeftBtn').addEventListener('click', () => {
-    document.getElementById('leftPanel').classList.toggle('collapsed');
+    leftPanel.classList.add('collapsed');
+    expandLeftBtn.classList.add('visible');
+  });
+  expandLeftBtn.addEventListener('click', () => {
+    leftPanel.classList.remove('collapsed');
+    expandLeftBtn.classList.remove('visible');
   });
 
   // 监听缩放变化

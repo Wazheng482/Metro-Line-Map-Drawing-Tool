@@ -5,6 +5,12 @@ const Settings = (() => {
       backgroundColor: '背景颜色',
       grid: '网格',
       language: '语言',
+      settings: '设置',
+      collapse: '折叠',
+      properties: '属性面板',
+      chooseElement: '选择画布中的元素以编辑属性',
+      ready: '就绪',
+      create: '创建',
       imageDownload: '图片下载',
       format: '格式',
       resolution: '分辨率倍数',
@@ -29,8 +35,10 @@ const Settings = (() => {
       lineNameEn: '线路名称（英文）',
       labelPosition: '标签位置',
       stationType: '站点类型',
-      normalStation: '普通站点',
-      interchangeStation: '换乘站点',
+      normalStation: '普通站',
+      interchangeStation: '换乘站',
+      normalStationFull: '普通站点',
+      interchangeStationFull: '换乘站点',
       stationInfo: '线路信息',
       stationCount: '站点数',
       passThrough: '途经',
@@ -52,14 +60,36 @@ const Settings = (() => {
       fitView: '适应视图',
       clearCanvas: '清空画布',
       tools: '工具',
-      chooseElement: '选择画布中的元素以编辑属性',
-      dragToCanvas: '拖拽到画布'
+      selectTool: '选择工具 (V)',
+      lineTool: '线路工具 (L)',
+      textTool: '文本工具 (T)',
+      normalStationTool: '普通站点',
+      interchangeStationTool: '换乘站点',
+      dragToCanvas: '拖拽到画布',
+      enterStationName: '输入站点名称',
+      enterLineName: '输入线路名称',
+      enterText: '输入文本',
+      fontYaHei: '微软雅黑',
+      fontSimSun: '宋体',
+      fontKaiTi: '楷体',
+      fontFangSong: '仿宋',
+      fontSimHei: '黑体',
+      fontSansSerif: '无衬线',
+      fontSerif: '衬线体',
+      unknown: '未知',
+      expandPanel: '展开属性面板'
     },
     en: {
       export: 'Export',
       backgroundColor: 'Background',
       grid: 'Grid',
       language: 'Language',
+      settings: 'Settings',
+      collapse: 'Collapse',
+      properties: 'Properties',
+      chooseElement: 'Select an element on the canvas to edit properties',
+      ready: 'Ready',
+      create: 'Create',
       imageDownload: 'Image Download',
       format: 'Format',
       resolution: 'Resolution',
@@ -84,8 +114,10 @@ const Settings = (() => {
       lineNameEn: 'Line Name (EN)',
       labelPosition: 'Label Position',
       stationType: 'Station Type',
-      normalStation: 'Normal Station',
-      interchangeStation: 'Interchange Station',
+      normalStation: 'Normal',
+      interchangeStation: 'Interchange',
+      normalStationFull: 'Normal Station',
+      interchangeStationFull: 'Interchange Station',
       stationInfo: 'Line Info',
       stationCount: 'Stations',
       passThrough: 'Via',
@@ -107,8 +139,24 @@ const Settings = (() => {
       fitView: 'Fit View',
       clearCanvas: 'Clear Canvas',
       tools: 'Tools',
-      chooseElement: 'Select an element on the canvas to edit properties',
-      dragToCanvas: 'Drag to canvas'
+      selectTool: 'Select Tool (V)',
+      lineTool: 'Line Tool (L)',
+      textTool: 'Text Tool (T)',
+      normalStationTool: 'Normal Station',
+      interchangeStationTool: 'Interchange Station',
+      dragToCanvas: 'Drag to canvas',
+      enterStationName: 'Enter station name',
+      enterLineName: 'Enter line name',
+      enterText: 'Enter text',
+      fontYaHei: 'Microsoft YaHei',
+      fontSimSun: 'SimSun',
+      fontKaiTi: 'KaiTi',
+      fontFangSong: 'FangSong',
+      fontSimHei: 'SimHei',
+      fontSansSerif: 'Sans-serif',
+      fontSerif: 'Serif',
+      unknown: 'Unknown',
+      expandPanel: 'Expand properties panel'
     }
   };
 
@@ -316,6 +364,11 @@ const Settings = (() => {
     });
 
     updateDynamicText();
+
+    // 重新渲染属性面板（属性面板内容由 JS 动态生成，需要重新渲染以应用新语言）
+    if (typeof Properties !== 'undefined' && typeof Properties.render === 'function') {
+      try { Properties.render(); } catch (e) { /* Properties 尚未初始化 */ }
+    }
   }
 
   function updateDynamicText() {

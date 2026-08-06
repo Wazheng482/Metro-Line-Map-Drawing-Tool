@@ -214,6 +214,7 @@ body {
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
 }
 
 /* ========== 左侧属性面板 ========== */
@@ -230,6 +231,40 @@ body {
 .left-panel.collapsed {
   width: 0;
   overflow: hidden;
+}
+
+/* 折叠后的展开按钮 */
+.expand-left-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) translateX(-100%);
+  width: 24px;
+  height: 60px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.expand-left-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) translateX(0);
+}
+
+.expand-left-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .panel-header {
