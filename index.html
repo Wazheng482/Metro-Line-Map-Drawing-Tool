@@ -42,12 +42,8 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
       </button>
       <div class="divider"></div>
-      <button class="btn-primary" id="exportBtn" title="导出预览">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <span data-i18n="export">导出</span>
-      </button>
       <div class="settings-wrapper">
-        <button class="btn-ghost" id="settingsBtn" title="设置">
+        <button class="btn-ghost" id="settingsBtn" title="设置" data-i18n-title="settings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
         <div class="settings-dropdown" id="settingsDropdown">
@@ -75,6 +71,10 @@
           </div>
         </div>
       </div>
+      <button class="btn-primary" id="exportBtn" title="导出预览">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="export">导出</span>
+      </button>
     </div>
   </header>
 
@@ -82,15 +82,15 @@
     <!-- 左侧属性面板 -->
     <aside class="left-panel" id="leftPanel">
       <div class="panel-header">
-        <span class="panel-title">属性面板</span>
-        <button class="btn-icon" id="collapseLeftBtn" title="折叠">
+        <span class="panel-title" data-i18n="properties">属性面板</span>
+        <button class="btn-icon" id="collapseLeftBtn" title="折叠" data-i18n-title="collapse">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
       </div>
       <div class="panel-body" id="propertyPanel">
         <div class="empty-state">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <p>选择画布中的元素以编辑属性</p>
+          <p data-i18n="chooseElement">选择画布中的元素以编辑属性</p>
         </div>
       </div>
     </aside>
@@ -113,57 +113,57 @@
       </svg>
       <div class="canvas-hint" id="canvasHint"></div>
       <div class="canvas-status">
-        <span id="statusText">就绪</span>
+        <span id="statusText" data-i18n="ready">就绪</span>
       </div>
     </main>
 
     <!-- 右侧工具栏 -->
     <aside class="right-panel" id="rightPanel">
       <div class="panel-header">
-        <span class="panel-title">工具</span>
+        <span class="panel-title" data-i18n="tools">工具</span>
       </div>
       <div class="panel-body">
         <div class="tool-section">
-          <div class="section-label">选择</div>
+          <div class="section-label" data-i18n="select">选择</div>
           <div class="tool-grid">
-            <button class="tool-btn active" data-tool="select" title="选择工具 (V)">
+            <button class="tool-btn active" data-tool="select" title="选择工具 (V)" data-i18n-title="selectTool">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
-              <span>选择</span>
+              <span data-i18n="select">选择</span>
             </button>
           </div>
         </div>
 
         <div class="tool-section">
-          <div class="section-label">站点 <span class="hint-text">拖拽到画布</span></div>
+          <div class="section-label" data-i18n="station">站点 <span class="hint-text" data-i18n="dragToCanvas">拖拽到画布</span></div>
           <div class="tool-grid">
-            <div class="tool-card" draggable="true" data-tool="station-normal" title="普通站点">
+            <div class="tool-card" draggable="true" data-tool="station-normal" title="普通站点" data-i18n-title="normalStation">
               <div class="tool-icon station-normal-icon">
                 <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="6" fill="currentColor"/></svg>
               </div>
-              <span>普通站</span>
+              <span data-i18n="normalStation">普通站</span>
             </div>
-            <div class="tool-card" draggable="true" data-tool="station-interchange" title="换乘站点">
+            <div class="tool-card" draggable="true" data-tool="station-interchange" title="换乘站点" data-i18n-title="interchangeStation">
               <div class="tool-icon station-interchange-icon">
                 <svg viewBox="0 0 40 40">
                   <circle cx="20" cy="20" r="8" fill="none" stroke="currentColor" stroke-width="3"/>
                   <circle cx="20" cy="20" r="3" fill="currentColor"/>
                 </svg>
               </div>
-              <span>换乘站</span>
+              <span data-i18n="interchangeStation">换乘站</span>
             </div>
           </div>
         </div>
 
         <div class="tool-section">
-          <div class="section-label">创建</div>
+          <div class="section-label" data-i18n="create">创建</div>
           <div class="tool-grid">
-            <button class="tool-btn" data-tool="line" title="线路工具 (L)">
+            <button class="tool-btn" data-tool="line" title="线路工具 (L)" data-i18n-title="lineTool">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="20" x2="20" y2="4"/><circle cx="4" cy="20" r="2" fill="currentColor"/><circle cx="20" cy="4" r="2" fill="currentColor"/></svg>
-              <span>线路</span>
+              <span data-i18n="line">线路</span>
             </button>
-            <button class="tool-btn" data-tool="text" title="文本工具 (T)">
+            <button class="tool-btn" data-tool="text" title="文本工具 (T)" data-i18n-title="textTool">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
-              <span>文本</span>
+              <span data-i18n="text">文本</span>
             </button>
           </div>
         </div>
