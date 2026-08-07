@@ -1,8 +1,8 @@
-# 🚇 Metro Line Map Drawing Tool
+# Metro Line Map Drawing Tool
 
 一个功能强大的在线地铁线路图绘制工具。零依赖、零注册，开箱即用。
 
-## ✨ 功能特性
+## 功能特性
 
 ### 核心工具
 - **选择工具 (V)**：选择、拖拽站点
@@ -32,7 +32,7 @@
 - **缩放 / 平移**：滚轮缩放、拖拽平移、按钮适应视图
 - **数据本地存储**：所有数据保存在浏览器 localStorage 中
 
-## 🎯 使用流程
+## 使用流程
 
 1. 点击 **站点工具**，在画布上点击创建站点
 2. 点击 **线路工具**，从一个站点拖拽经过其他站点
@@ -41,5 +41,5 @@
 5. 多个线路共用站点 → 自动变为换乘站
 6. 选中元素，在左侧属性面板编辑名称、颜色、线型
 
-👉 [在线体验](https://zeenyonug.github.io/Metro-Line-Map-Drawing-Tool/)
+[在线体验](https://zeenyonug.github.io/Metro-Line-Map-Drawing-Tool/)
 
