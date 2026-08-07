@@ -101,13 +101,14 @@ body {
 .tool-group .tool-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 8px;
+  justify-content: center;
+  padding: 8px 12px;
   background: transparent;
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
 }
