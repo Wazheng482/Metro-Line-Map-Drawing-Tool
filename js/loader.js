@@ -2,21 +2,21 @@
 (function () {
   const SCRIPTS = [
     'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
-    'vendor/mespeak/mespeak.js?v=13',
-    'js/state.js?v=13',
-    'js/geometry.js?v=13',
-    'js/settings.js?v=13',
-    'js/welcome.js?v=13',
-    'js/canvas.js?v=13',
-    'js/properties.js?v=13',
-    'js/toolbar.js?v=13',
-    'js/export.js?v=13',
-    'js/home.js?v=13',
-    'js/app.js?v=13'
+    'vendor/mespeak/mespeak.js?v=14',
+    'js/state.js?v=14',
+    'js/geometry.js?v=14',
+    'js/settings.js?v=14',
+    'js/welcome.js?v=14',
+    'js/canvas.js?v=14',
+    'js/properties.js?v=14',
+    'js/toolbar.js?v=14',
+    'js/export.js?v=14',
+    'js/home.js?v=14',
+    'js/app.js?v=14'
   ];
 
   const STYLES = [
-    'css/styles.css?v=13'
+    'css/styles.css?v=14'
   ];
 
   const STATUS_TEXTS = {
