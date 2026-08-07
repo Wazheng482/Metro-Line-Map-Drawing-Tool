@@ -19,12 +19,48 @@
     'css/styles.css?v=14'
   ];
 
-  const STATUS_TEXTS = {
-    css: '正在加载样式表...',
-    js: '正在加载脚本...',
-    font: '正在加载字体...',
-    final: '即将完成...'
+  // 读取当前语言设置（在 settings.js 加载之前，直接读 localStorage）
+  function getCurrentLang() {
+    try {
+      const saved = localStorage.getItem('metroMapSettings');
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.language) return data.language;
+      }
+    } catch (e) {}
+    // 首次访问还没设置过，看浏览器语言
+    const nav = (navigator.language || 'zh').toLowerCase();
+    return nav.startsWith('zh') ? 'zh' : 'en';
+  }
+  const LANG = getCurrentLang();
+
+  const I18N = {
+    zh: {
+      title: 'Metro Line Map Drawing Tool',
+      css: '正在加载样式表...',
+      js: '正在加载脚本...',
+      font: '正在加载字体...',
+      final: '即将完成...',
+      done: '加载完成'
+    },
+    en: {
+      title: 'Metro Line Map Drawing Tool',
+      css: 'Loading stylesheets...',
+      js: 'Loading scripts...',
+      font: 'Loading fonts...',
+      final: 'Almost done...',
+      done: 'Ready'
+    }
   };
+  const T = I18N[LANG] || I18N.en;
+
+  // 应用加载页面标题翻译
+  const titleEl = document.querySelector('.loading-title');
+  if (titleEl && LANG === 'zh') {
+    titleEl.textContent = '地铁线路图绘制工具';
+  } else if (titleEl) {
+    titleEl.textContent = T.title;
+  }
 
   let totalTasks = SCRIPTS.length + STYLES.length + 1; // +1 字体加载
   let doneTasks = 0;
@@ -113,7 +149,7 @@
   }
 
   async function start() {
-    updateProgress(STATUS_TEXTS.css);
+    updateProgress(T.css);
 
     // 1. 加载样式表
     for (const href of STYLES) {
@@ -121,7 +157,7 @@
       taskDone();
     }
 
-    updateProgress(STATUS_TEXTS.js);
+    updateProgress(T.js);
 
     // 2. 加载脚本（按顺序，保证依赖）
     for (const src of SCRIPTS) {
@@ -129,20 +165,20 @@
       taskDone();
     }
 
-    updateProgress(STATUS_TEXTS.font);
+    updateProgress(T.font);
 
     // 3. 等待字体加载
     await waitForFonts();
     taskDone();
 
-    updateProgress(STATUS_TEXTS.final);
+    updateProgress(T.final);
   }
 
   function finishLoading() {
     // 确保进度满
     if (fillEl) fillEl.style.width = '100%';
     if (textEl) textEl.textContent = '100%';
-    if (statusEl) statusEl.textContent = '加载完成';
+    if (statusEl) statusEl.textContent = T.done;
 
     // 延迟一点点，让用户看到 100%
     setTimeout(() => {
