@@ -173,13 +173,11 @@
           </label>
           <div id="audioDownloadPanel" class="export-panel">
             <div class="audio-hint" data-i18n="audioHint">
-              点击"开始下载"后，浏览器会弹出共享对话框：<br>
-              1. 选择<strong>当前标签页</strong><br>
-              2. <strong>务必勾选</strong>底部"分享标签页音频"复选框<br>
-              3. 点击"分享"，系统将逐条朗读并录制为 WAV 音频<br>
-              4. 请保持标签页在前台，录制完成自动下载 ZIP<br>
-              <br>
-              <span>注意：如不勾选音频共享，将回退为导出文本文件 + Python 脚本。</span>
+              点击"开始下载"后，系统将使用内置语音引擎（meSpeak.js）离线合成报站音频：
+1. 中文使用普通话语音，英文使用美式英语语音
+2. 音频为 WAV 格式，自动打包为 ZIP 下载
+3. 完全离线运行，无需联网，无需授权弹窗
+注意：合成音为机器人音。如需真人音质，可使用文本 + Python 脚本方案（gTTS/edge-tts）。
             </div>
           </div>
         </div>
@@ -353,6 +351,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="vendor/mespeak/mespeak.js?v=10"></script>
 <script src="js/state.js?v=10"></script>
 <script src="js/geometry.js?v=10"></script>
 <script src="js/settings.js?v=10"></script>

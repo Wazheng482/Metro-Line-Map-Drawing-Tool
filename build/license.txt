@@ -1,0 +1,52 @@
+地铁线路图绘制工具 - 服务条款与隐私政策
+Metro Line Map Drawing Tool - Terms of Service & Privacy Policy
+
+========================================
+服务条款 / Terms of Service
+========================================
+
+欢迎使用地铁线路图绘制工具。在使用本软件之前，请仔细阅读以下服务条款：
+
+1. 本软件为免费工具，您可以自由使用、导出所创建的地铁线路图。
+2. 您创建的内容仅保存在本地设备中，卸载软件将导致数据丢失。
+3. 本软件不承担因数据丢失、使用不当造成的任何损失。
+4. 请勿利用本软件创建违法、违规内容。
+5. 本软件基于 meSpeak.js (GPL v3) 实现语音合成功能。
+
+Welcome to Metro Line Map Drawing Tool. Please read the following terms carefully before using this software:
+
+1. This software is free. You can freely use and export the metro maps you create.
+2. Your creations are stored only on your local device. Uninstalling the software will lose them.
+3. This software is not responsible for any loss caused by data loss or misuse.
+4. Do not use this software to create illegal or violating content.
+5. This software uses meSpeak.js (GPL v3) for speech synthesis.
+
+========================================
+隐私政策 / Privacy Policy
+========================================
+
+本软件高度重视您的隐私：
+
+1. 所有数据仅存储在您本地设备中。
+2. 本软件不收集、不上传任何用户数据。
+3. 您导出的图片和音频文件仅在您的设备上生成。
+4. 报站音频使用内置语音引擎（meSpeak.js）离线合成，无需联网。
+5. 如需清除数据，可通过软件设置或卸载软件。
+
+This software values your privacy highly:
+
+1. All data is stored only on your local device.
+2. This software does not collect or upload any user data.
+3. The images and audio you export are generated only on your device.
+4. Station audio is synthesized offline using the built-in speech engine (meSpeak.js), no internet required.
+5. To clear data, use the software settings or uninstall the software.
+
+========================================
+
+© 2026 zeenyoung
+
+本软件包含以下第三方组件：
+This software includes the following third-party components:
+- meSpeak.js (GPL v3) - https://www.masswerk.at/mespeak/
+- JSZip (MIT) - https://stuk.github.io/jszip/
+- Electron (MIT) - https://www.electronjs.org/

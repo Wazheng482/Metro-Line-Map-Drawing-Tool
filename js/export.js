@@ -655,81 +655,73 @@ if __name__ == '__main__':
 `;
   }
 
-  // ============ 浏览器内 TTS 录制为 WAV ============
+  // ============ meSpeak.js 离线 TTS 合成 ============
 
-  // AudioBuffer 转 WAV Blob
-  function audioBufferToWav(buffer) {
-    const numChannels = buffer.numberOfChannels;
-    const sampleRate = buffer.sampleRate;
-    const bitDepth = 16;
-    const numSamples = buffer.length;
-    const dataSize = numSamples * numChannels * (bitDepth / 8);
-    const arrayBuffer = new ArrayBuffer(44 + dataSize);
-    const view = new DataView(arrayBuffer);
+  let mespeakReady = false;
+  let mespeakInitPromise = null;
 
-    function writeStr(off, s) { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); }
-    writeStr(0, 'RIFF');
-    view.setUint32(4, 36 + dataSize, true);
-    writeStr(8, 'WAVE');
-    writeStr(12, 'fmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, numChannels, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * numChannels * (bitDepth / 8), true);
-    view.setUint16(32, numChannels * (bitDepth / 8), true);
-    view.setUint16(34, bitDepth, true);
-    writeStr(36, 'data');
-    view.setUint32(40, dataSize, true);
-
-    let offset = 44;
-    const channels = [];
-    for (let ch = 0; ch < numChannels; ch++) channels.push(buffer.getChannelData(ch));
-    for (let i = 0; i < numSamples; i++) {
-      for (let ch = 0; ch < numChannels; ch++) {
-        const s = Math.max(-1, Math.min(1, channels[ch][i]));
-        view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
-        offset += 2;
+  // 初始化 meSpeak：加载中英文语音模块（仅需一次）
+  function initMeSpeak() {
+    if (mespeakReady) return Promise.resolve(true);
+    if (mespeakInitPromise) return mespeakInitPromise;
+    mespeakInitPromise = new Promise((resolve, reject) => {
+      if (typeof meSpeak === 'undefined') {
+        reject(new Error('meSpeak 未加载'));
+        return;
       }
-    }
-    return new Blob([arrayBuffer], { type: 'audio/wav' });
+      // 用计数器等待两个语音都回调完毕再判定，避免并行竞态导致先到者误判失败
+      let zhOk = false, enOk = false, settled = false;
+      let pending = 2;
+      function checkDone() {
+        if (settled) return;
+        if (pending > 0) return; // 还有语音未回调
+        settled = true;
+        if (zhOk && enOk) {
+          mespeakReady = true;
+          resolve(true);
+        } else {
+          reject(new Error('语音模块加载失败 zh=' + zhOk + ' en=' + enOk));
+        }
+      }
+      // 加载中文语音 (voices/zh.json) 与英文语音 (voices/en/en-us.json)
+      meSpeak.loadVoice('zh', (success) => { zhOk = !!success; pending--; checkDone(); });
+      meSpeak.loadVoice('en/en-us', (success) => { enOk = !!success; pending--; checkDone(); });
+      // 超时保护（8 秒）
+      setTimeout(() => { if (!settled) { settled = true; reject(new Error('语音模块加载超时')); } }, 8000);
+    });
+    return mespeakInitPromise;
   }
 
-  // 朗读单条文本并录制为 WAV Blob
-  function recordTTS(text, lang, audioStream) {
-    return new Promise((resolve, reject) => {
-      let recorder;
+  // 用 meSpeak 合成单条文本为 WAV Blob（rawdata 模式直接返回 ArrayBuffer，不播放）
+  function synthWithMeSpeak(text, voice) {
+    return new Promise((resolve) => {
+      let settled = false;
+      // 超时保护：meSpeak 在 defaultVoice 未就绪等极端情况下可能永不回调
+      const timer = setTimeout(() => {
+        if (!settled) { settled = true; resolve(null); }
+      }, 30000);
       try {
-        recorder = new MediaRecorder(audioStream);
-      } catch (e) { reject(e); return; }
-      const chunks = [];
-      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-      recorder.onstop = async () => {
-        try {
-          const webmBlob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
-          const arrayBuffer = await webmBlob.arrayBuffer();
-          const audioCtx = new AudioContext();
-          const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-          const wavBlob = audioBufferToWav(audioBuffer);
-          audioCtx.close();
-          resolve(wavBlob);
-        } catch (e) {
-          resolve(null);
-        }
-      };
-      recorder.start();
-
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = lang;
-      u.rate = 0.95;
-      // 尝试选择对应语言的语音
-      const voices = speechSynthesis.getVoices();
-      const matched = voices.find(v => v.lang === lang) || voices.find(v => v.lang.startsWith(lang.split('-')[0]));
-      if (matched) u.voice = matched;
-
-      u.onend = () => { setTimeout(() => { if (recorder.state !== 'inactive') recorder.stop(); }, 300); };
-      u.onerror = () => { if (recorder.state !== 'inactive') recorder.stop(); };
-      speechSynthesis.speak(u);
+        meSpeak.speak(text, {
+          rawdata: 'array',
+          voice: voice,
+          amplitude: 100,
+          pitch: 50,
+          speed: 175,
+          wordgap: 0
+        }, (success, id, audiodata) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          if (success && audiodata) {
+            // audiodata 为 Uint8Array，可直接用于 Blob
+            resolve(new Blob([audiodata], { type: 'audio/wav' }));
+          } else {
+            resolve(null);
+          }
+        });
+      } catch (e) {
+        if (!settled) { settled = true; clearTimeout(timer); resolve(null); }
+      }
     });
   }
 
@@ -760,69 +752,71 @@ if __name__ == '__main__':
 
   async function downloadAudioZip() {
     if (typeof JSZip === 'undefined') { alert('JSZip 未加载，无法生成 ZIP。'); return; }
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-      alert('当前浏览器不支持音频捕获，将导出文本文件 + Python 脚本。');
-      return downloadTextOnlyZip();
-    }
 
     const state = State.getState();
     const files = buildAudioFilesData(state);
     if (files.length === 0) { alert('没有可导出的线路数据。'); return; }
 
-    // 请求用户共享标签页音频
-    let stream;
-    try {
-      stream = await navigator.mediaDevices.getDisplayMedia({ audio: true, video: true });
-    } catch (e) {
-      // 用户拒绝或不支持，回退到纯文本
-      return downloadTextOnlyZip();
+    // 初始化 meSpeak 语音引擎（首次加载中英文语音模块）
+    let meSpeakAvailable = false;
+    if (typeof meSpeak !== 'undefined') {
+      try {
+        await initMeSpeak();
+        meSpeakAvailable = true;
+      } catch (e) {
+        meSpeakAvailable = false;
+        console.warn('meSpeak 初始化失败:', e.message);
+      }
     }
 
-    const audioTracks = stream.getAudioTracks();
-    if (audioTracks.length === 0) {
-      stream.getTracks().forEach(t => t.stop());
-      alert('未捕获到音频，请勾选"分享标签页音频"。将导出文本文件。');
+    if (!meSpeakAvailable) {
+      alert('语音引擎加载失败，将导出文本文件 + Python 脚本。');
       return downloadTextOnlyZip();
-    }
-
-    const audioStream = new MediaStream(audioTracks);
-    // 停止视频轨（不需要）
-    stream.getVideoTracks().forEach(t => t.stop());
-
-    // 确保语音已加载
-    if (speechSynthesis.getVoices().length === 0) {
-      await new Promise(r => { speechSynthesis.onvoiceschanged = r; setTimeout(r, 1000); });
     }
 
     showProgress(files.length);
     const zip = new JSZip();
     let done = 0;
+    let successCount = 0;
+    let failCount = 0;
 
     for (const f of files) {
-      const lang = f.path.startsWith('中文') ? 'zh-CN' : 'en';
+      const voice = f.path.startsWith('中文') ? 'zh' : 'en/en-us';
       const label = f.path.split('/').pop().replace('.txt', '');
       updateProgress(done, files.length, label);
 
       try {
-        const wavBlob = await recordTTS(f.content, lang, audioStream);
+        const wavBlob = await synthWithMeSpeak(f.content, voice);
         if (wavBlob) {
           const wavPath = f.path.replace('.txt', '.wav');
           zip.file(wavPath, wavBlob);
+          successCount++;
         } else {
-          zip.file(f.path, f.content); // 回退文本
+          zip.file(f.path, f.content); // 合成失败，回退文本
+          failCount++;
         }
       } catch (e) {
-        zip.file(f.path, f.content); // 回退文本
+        zip.file(f.path, f.content); // 异常，回退文本
+        failCount++;
       }
       done++;
       updateProgress(done, files.length, label);
-      // 间隔避免连续朗读卡顿
-      await new Promise(r => setTimeout(r, 200));
+      // 让 worker 有时间清理，避免连续合成卡顿
+      await new Promise(r => setTimeout(r, 50));
     }
 
-    // 停止音频捕获
-    audioTracks.forEach(t => t.stop());
     hideProgress();
+
+    // 全部失败则回退纯文本方案
+    if (successCount === 0) {
+      alert('语音合成全部失败，将导出文本文件 + Python 脚本。');
+      return downloadTextOnlyZip();
+    }
+
+    // 部分失败时给出提示
+    if (failCount > 0) {
+      console.warn(`音频合成：成功 ${successCount} 个，失败 ${failCount} 个（失败项已回退为文本）。`);
+    }
 
     const blob = await zip.generateAsync({ type: 'blob' });
     const url = URL.createObjectURL(blob);

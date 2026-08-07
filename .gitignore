@@ -8,3 +8,11 @@ cpolar/
 serve.py
 add-hosts.bat
 start-server.bat
+
+# Electron
+node_modules/
+dist/
+out/
+*.log
+npm-debug.log*
+
