@@ -86,7 +86,7 @@ const Export = (() => {
     const mlmdtChecked = document.getElementById('toggleMlmdtExport') && document.getElementById('toggleMlmdtExport').checked;
 
     if (!imgChecked && !audioChecked && !mlmdtChecked) {
-      alert('请至少选择一项下载内容。');
+      showToast('请至少选择一项下载内容', 'error');
       return;
     }
 
@@ -790,11 +790,11 @@ if __name__ == '__main__':
   }
 
   async function downloadAudioZip() {
-    if (typeof JSZip === 'undefined') { alert('JSZip 未加载，无法生成 ZIP。'); return; }
+    if (typeof JSZip === 'undefined') { showToast('JSZip 未加载，无法生成 ZIP', 'error'); return; }
 
     const state = State.getState();
     const files = buildAudioFilesData(state);
-    if (files.length === 0) { alert('没有可导出的线路数据。'); return; }
+    if (files.length === 0) { showToast('没有可导出的线路数据', 'error'); return; }
 
     // 初始化 meSpeak 语音引擎（首次加载中英文语音模块）
     let meSpeakAvailable = false;
@@ -809,7 +809,7 @@ if __name__ == '__main__':
     }
 
     if (!meSpeakAvailable) {
-      alert('语音引擎加载失败，将导出文本文件 + Python 脚本。');
+      showToast('语音引擎加载失败，将导出文本文件 + Python 脚本', 'error');
       return downloadTextOnlyZip();
     }
 
@@ -848,7 +848,7 @@ if __name__ == '__main__':
 
     // 全部失败则回退纯文本方案
     if (successCount === 0) {
-      alert('语音合成全部失败，将导出文本文件 + Python 脚本。');
+      showToast('语音合成全部失败，将导出文本文件 + Python 脚本', 'error');
       return downloadTextOnlyZip();
     }
 

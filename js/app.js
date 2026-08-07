@@ -1,3 +1,14 @@
+// Toast 提示工具 - 屏幕中上方圆角悬浮框，自动消失
+function showToast(msg, type) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const el = document.createElement('div');
+  el.className = 'toast' + (type === 'success' ? ' toast-success' : type === 'error' ? ' toast-error' : '');
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => { el.remove(); }, 2100);
+}
+
 // 主应用入口 - 由 loader.js 在所有资源加载完毕后调用 window.startApp()
 function init() {
   Canvas.init();

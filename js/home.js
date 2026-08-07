@@ -241,7 +241,7 @@ const Home = (() => {
   function saveCurrentProject() {
     const state = State.getState();
     if (state.stations.length === 0 && state.lines.length === 0 && state.textBlocks.length === 0) {
-      alert('画布为空，无法保存。');
+      showToast('画布为空，无法保存', 'error');
       return;
     }
 
@@ -273,7 +273,7 @@ const Home = (() => {
     }
 
     saveProjects(projects);
-    alert('项目已保存：' + name);
+    showToast('保存成功：' + name, 'success');
   }
 
   function saveCurrentAndReturn() {
@@ -329,7 +329,7 @@ const Home = (() => {
       try {
         const data = JSON.parse(event.target.result);
         if (data.format !== 'MLMDT') {
-          alert('文件格式不正确，请使用 MLMDT 文件。');
+          showToast('文件格式不正确', 'error');
           return;
         }
         const success = State.importProjectData(data);
@@ -360,10 +360,10 @@ const Home = (() => {
           State.setOffset(0, 0);
           hide();
         } else {
-          alert('导入失败：项目数据无效。');
+          showToast('导入失败：数据无效', 'error');
         }
       } catch (err) {
-        alert('导入失败：文件解析错误。');
+        showToast('导入失败：文件解析错误', 'error');
       }
     };
     reader.readAsText(file);
