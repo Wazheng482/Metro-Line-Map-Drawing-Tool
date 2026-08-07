@@ -41,21 +41,5 @@
 5. 多个线路共用站点 → 自动变为换乘站
 6. 选中元素，在左侧属性面板编辑名称、颜色、线型
 
-## ⌨️ 快捷键
+👉 [在线体验](https://wazheng482.github.io/Metro-Line-Map-Drawing-Tool/)
 
-| 快捷键 | 功能 |
-|:------:|------|
-| `V` | 选择工具 |
-| `S` | 站点工具 |
-| `L` | 线路工具 |
-| `Ctrl+Z` | 撤销 |
-| `Ctrl+Y` | 重做 |
-| `Shift+拖拽` | 站点 8 方向约束移动 |
-
-## 🌐 在线体验
-
-👉 [GitHub Pages](https://wazheng482.github.io/Metro-Line-Map-Drawing-Tool/)
-
-## 📝 License
-
-© 2026 zeenyoung
