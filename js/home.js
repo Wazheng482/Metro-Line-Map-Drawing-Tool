@@ -84,19 +84,22 @@ const Home = (() => {
   function renderProjectList() {
     const projects = getProjects();
     if (projects.length === 0) {
-      projectListEl.innerHTML = '<div class="project-empty">暂无项目，点击上方按钮创建或导入</div>';
+      projectListEl.innerHTML = `<div class="project-empty">${Settings.t('noProjects')}</div>`;
       return;
     }
 
     // 按修改时间倒序
     projects.sort((a, b) => new Date(b.modified) - new Date(a.modified));
 
+    const tStations = Settings.t('stations');
+    const tLines = Settings.t('lines');
+
     projectListEl.innerHTML = projects.map(p => `
       <div class="project-item" data-id="${p.id}">
         <div class="project-info">
           <div class="project-name">${escapeHtml(p.name)}</div>
           <div class="project-meta">
-            <span>${p.stations || 0} 站 / ${p.lines || 0} 线</span>
+            <span>${p.stations || 0} ${tStations} / ${p.lines || 0} ${tLines}</span>
             <span>${formatDate(p.modified)}</span>
           </div>
         </div>
@@ -134,16 +137,19 @@ const Home = (() => {
       .slice(0, 5);
 
     if (recentProjects.length === 0) {
-      recentListEl.innerHTML = '<div class="project-empty">暂无最近项目</div>';
+      recentListEl.innerHTML = `<div class="project-empty">${Settings.t('noRecent')}</div>`;
       return;
     }
+
+    const tStations = Settings.t('stations');
+    const tLines = Settings.t('lines');
 
     recentListEl.innerHTML = recentProjects.map(p => `
       <div class="project-item" data-id="${p.id}">
         <div class="project-info">
           <div class="project-name">${escapeHtml(p.name)}</div>
           <div class="project-meta">
-            <span>${p.stations || 0} 站 / ${p.lines || 0} 线</span>
+            <span>${p.stations || 0} ${tStations} / ${p.lines || 0} ${tLines}</span>
             <span>${formatDate(p.modified)}</span>
           </div>
         </div>

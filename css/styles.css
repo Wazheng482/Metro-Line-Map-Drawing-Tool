@@ -282,10 +282,29 @@ body {
   max-width: 90vw;
 }
 
-#resetConfirmModal .modal-body {
-  flex-direction: column;
-  padding: 24px;
+.reset-modal-body {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  padding: 24px 20px !important;
+  gap: 20px !important;
+}
+
+.reset-modal-text {
+  font-size: 15px;
+  color: var(--text-primary);
   text-align: center;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.reset-modal-btns {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 12px !important;
 }
 
 #newProjectModal .modal {

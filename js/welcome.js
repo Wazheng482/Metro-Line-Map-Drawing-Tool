@@ -66,8 +66,8 @@ const Welcome = (() => {
       Settings.applyBg(selectedBg);
       localStorage.setItem('metroMapVisited', 'true');
       hideWelcome();
-      // 直接进入新项目
-      Home.createNewProject();
+      // 返回主页，不自动新建项目
+      Home.show();
     });
   }
 

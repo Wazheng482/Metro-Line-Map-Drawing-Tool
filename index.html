@@ -38,29 +38,29 @@
         <circle cx="8" cy="8" r="5"/>
         <circle cx="8" cy="8" r="2" fill="currentColor"/>
       </svg>
-      <span class="brand-name">Metro Line Map Drawing Tool</span>
+      <span class="brand-name" data-i18n="homeTitle">Metro Line Map Drawing Tool</span>
     </div>
     <div class="home-actions">
       <button class="btn-ghost" id="homeImportBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        导入项目
+        <span data-i18n="importProject">导入项目</span>
       </button>
       <button class="btn-primary" id="homeNewBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        新建项目
+        <span data-i18n="newProject">新建项目</span>
       </button>
-      <button class="btn-ghost" id="homeSettingsBtn" title="设置">
+      <button class="btn-ghost" id="homeSettingsBtn" title="设置" data-i18n-title="settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
     </div>
   </div>
   <div class="home-body">
     <aside class="home-sidebar">
-      <div class="sidebar-header">最近打开</div>
+      <div class="sidebar-header" data-i18n="recentOpened">最近打开</div>
       <div id="recentList" class="project-list"></div>
     </aside>
     <main class="home-main">
-      <div class="sidebar-header" style="margin-bottom:12px;">我的项目</div>
+      <div class="sidebar-header" style="margin-bottom:12px;" data-i18n="myProjects">我的项目</div>
       <div id="projectList" class="project-list"></div>
     </main>
   </div>
@@ -313,16 +313,16 @@
 
   <!-- 重置数据确认弹窗 -->
   <div class="modal-overlay" id="resetConfirmModal">
-    <div class="modal modal-sm">
+    <div class="modal modal-sm reset-modal-inner">
       <div class="modal-header">
         <h2 data-i18n="resetDataTitle">重置数据</h2>
         <button class="btn-icon" id="closeResetBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
-      <div class="modal-body" style="text-align:center;">
-        <p style="font-size:15px; color:var(--text-primary); margin-bottom:24px;" data-i18n="resetDataConfirm">是否重置所有数据？数据一旦重置，不可恢复！</p>
-        <div style="display:flex; justify-content:flex-end; gap:12px;">
+      <div class="modal-body reset-modal-body">
+        <p class="reset-modal-text" data-i18n="resetDataConfirm">是否重置所有数据？数据一旦重置，不可恢复！</p>
+        <div class="reset-modal-btns">
           <button class="btn-ghost" id="resetCancelBtn" data-i18n="cancel">取消</button>
           <button class="btn-danger-solid" id="resetConfirmBtn" disabled>确认 (5)</button>
         </div>

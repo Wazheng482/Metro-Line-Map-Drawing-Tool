@@ -149,7 +149,15 @@ const Settings = (() => {
       projectName: '项目名称',
       projectInfo: '项目信息',
       projectNamePlaceholder: '请输入项目名称',
-      projectInfoPlaceholder: '请输入项目信息（可选）'
+      projectInfoPlaceholder: '请输入项目信息（可选）',
+      homeTitle: '地铁线路图绘制工具',
+      importProject: '导入项目',
+      recentOpened: '最近打开',
+      myProjects: '我的项目',
+      noProjects: '暂无项目，点击上方按钮创建或导入',
+      noRecent: '暂无最近项目',
+      stations: '站',
+      lines: '线'
     },
     en: {
       export: 'Export',
@@ -300,7 +308,15 @@ const Settings = (() => {
       projectName: 'Project Name',
       projectInfo: 'Project Info',
       projectNamePlaceholder: 'Enter project name',
-      projectInfoPlaceholder: 'Enter project info (optional)'
+      projectInfoPlaceholder: 'Enter project info (optional)',
+      homeTitle: 'Metro Line Map Drawing Tool',
+      importProject: 'Import Project',
+      recentOpened: 'Recent',
+      myProjects: 'My Projects',
+      noProjects: 'No projects yet, click buttons above to create or import',
+      noRecent: 'No recent projects',
+      stations: 'St',
+      lines: 'Ln'
     }
   };
 

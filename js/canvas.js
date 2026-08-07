@@ -425,32 +425,15 @@ const Canvas = (() => {
     g.setAttribute('data-id', station.id);
     g.setAttribute('data-type', 'station');
 
-    // 站点图形 - 根据站点被引用的线路数量自动判断换乘
-    const linesReferencing = state.lines.filter(l => l.stationIds.includes(station.id));
-    const lineCount = linesReferencing.length;
-    const isTransfer = lineCount > 1;
+    // 站点图形 - 所有站点统一白色填充
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('class', 'station-circle');
     circle.setAttribute('cx', station.x);
     circle.setAttribute('cy', station.y);
     circle.setAttribute('r', 6);
-    
-    if (isTransfer) {
-      circle.setAttribute('fill', '#f1f5f9');
-      circle.setAttribute('stroke', '#0f172a');
-      circle.setAttribute('stroke-width', '2');
-      
-      const innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      innerCircle.setAttribute('cx', station.x);
-      innerCircle.setAttribute('cy', station.y);
-      innerCircle.setAttribute('r', 2);
-      innerCircle.setAttribute('fill', '#0f172a');
-      g.appendChild(innerCircle);
-    } else {
-      circle.setAttribute('fill', '#0f172a');
-      circle.setAttribute('stroke', '#f1f5f9');
-      circle.setAttribute('stroke-width', '2');
-    }
+    circle.setAttribute('fill', '#ffffff');
+    circle.setAttribute('stroke', '#1e293b');
+    circle.setAttribute('stroke-width', '2');
     g.appendChild(circle);
 
     // 标签
