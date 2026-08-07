@@ -49,13 +49,6 @@
 | `S` | 站点工具 |
 | `L` | 线路工具 |
 | `Ctrl+Z` | 撤销 |
-| `Ctrl+Y` | 重做 |
-| `Shift+拖拽` | 站点 8 方向约束移动 |
 
-## 🌐 在线体验
+👉 [在线体验](https://wazheng482.github.io/Metro-Line-Map-Drawing-Tool/)
 
-👉 [GitHub Pages](https://wazheng482.github.io/Metro-Line-Map-Drawing-Tool/)
-
-## 📝 License
-
-© 2026 zeenyoung
