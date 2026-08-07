@@ -268,7 +268,7 @@ const Export = (() => {
     return svg;
   }
 
-  // 在指定角落添加图例（每条线路一条垂直色条 + 中英文名）
+  // 在指定角落添加图例（每条线路一条垂直色条 + 中英文名，每竖列最多8条，超出换下一列）
   function appendCornerLegend(svg, state, width, height) {
     if (!state.lines || state.lines.length === 0) return;
 
@@ -278,23 +278,31 @@ const Export = (() => {
     const showEn = langs.en;
     const isSingleLang = (showCn !== showEn);
 
-    const pad = isSingleLang ? 14 : 12;
-    const barWidth = isSingleLang ? 8 : 6;
-    const barHeight = isSingleLang ? 30 : 40;
-    const entryGap = 10;
-    const textGap = 10;
+    // 缩小至原始尺寸的30%
+    const pad = isSingleLang ? 4 : 4;
+    const barWidth = isSingleLang ? 2 : 2;
+    const barHeight = isSingleLang ? 9 : 12;
+    const entryGap = 3;
+    const textGap = 3;
+    const colGap = 3; // 列间距
+    const maxRows = 8; // 每竖列最多8条
 
     function estimateTextWidth(line) {
       let w = 0;
-      if (showCn) w = Math.max(w, (line.name || '').length * (isSingleLang ? 17 : 14));
-      if (showEn) w = Math.max(w, (line.nameEn || '').length * (isSingleLang ? 10 : 7));
-      return Math.max(isSingleLang ? 80 : 60, w);
+      if (showCn) w = Math.max(w, (line.name || '').length * (isSingleLang ? 5 : 4));
+      if (showEn) w = Math.max(w, (line.nameEn || '').length * (isSingleLang ? 3 : 2));
+      return Math.max(isSingleLang ? 24 : 18, w);
     }
 
     const maxTextWidth = Math.max(...lines.map(estimateTextWidth));
     const entryWidth = barWidth + textGap + maxTextWidth;
-    const legendWidth = entryWidth + pad * 2;
-    const legendHeight = lines.length * barHeight + (lines.length - 1) * entryGap + pad * 2;
+    const totalLines = lines.length;
+    const colCount = Math.ceil(totalLines / maxRows);
+    const rowsInLastCol = ((totalLines - 1) % maxRows) + 1;
+    const rowCount = Math.min(totalLines, maxRows);
+
+    const legendWidth = colCount * entryWidth + (colCount - 1) * colGap + pad * 2;
+    const legendHeight = rowCount * barHeight + (rowCount - 1) * entryGap + pad * 2;
 
     const corner = getLegendCorner();
     const margin = 20;
@@ -329,8 +337,10 @@ const Export = (() => {
     group.appendChild(bgRect);
 
     lines.forEach((line, i) => {
-      const entryX = legendX + pad;
-      const entryY = legendY + pad + i * (barHeight + entryGap);
+      const col = Math.floor(i / maxRows); // 第几列
+      const row = i % maxRows; // 第几行
+      const entryX = legendX + pad + col * (entryWidth + colGap);
+      const entryY = legendY + pad + row * (barHeight + entryGap);
       const lineType = line.type || 'normal';
 
       if (lineType === 'highspeed') {
@@ -372,16 +382,17 @@ const Export = (() => {
         outerBar.setAttribute('width', barWidth);
         outerBar.setAttribute('height', barHeight);
         outerBar.setAttribute('fill', line.color || '#999999');
-        outerBar.setAttribute('rx', '2');
+        outerBar.setAttribute('rx', '1');
         group.appendChild(outerBar);
 
+        const innerInset = Math.max(0.5, barWidth * 0.25);
         const innerBar = document.createElementNS(SVG_NS, 'rect');
-        innerBar.setAttribute('x', entryX + 2);
-        innerBar.setAttribute('y', entryY + 2);
-        innerBar.setAttribute('width', Math.max(1, barWidth - 4));
-        innerBar.setAttribute('height', Math.max(1, barHeight - 4));
+        innerBar.setAttribute('x', entryX + innerInset);
+        innerBar.setAttribute('y', entryY + innerInset);
+        innerBar.setAttribute('width', Math.max(0.5, barWidth - innerInset * 2));
+        innerBar.setAttribute('height', Math.max(0.5, barHeight - innerInset * 2));
         innerBar.setAttribute('fill', '#ffffff');
-        innerBar.setAttribute('rx', '1');
+        innerBar.setAttribute('rx', '0.5');
         group.appendChild(innerBar);
       } else if (lineType === 'dashed') {
         // 虚线：用虚线笔触的线

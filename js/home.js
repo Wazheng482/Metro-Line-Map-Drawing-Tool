@@ -23,6 +23,36 @@ const Home = (() => {
       });
     }
 
+    // 新建项目弹窗
+    const newProjectModal = document.getElementById('newProjectModal');
+    const closeNewProjectBtn = document.getElementById('closeNewProjectBtn');
+    const cancelNewProjectBtn = document.getElementById('cancelNewProjectBtn');
+    const confirmNewProjectBtn = document.getElementById('confirmNewProjectBtn');
+    const newProjectNameInput = document.getElementById('newProjectName');
+
+    if (closeNewProjectBtn) {
+      closeNewProjectBtn.addEventListener('click', () => newProjectModal.classList.remove('show'));
+    }
+    if (cancelNewProjectBtn) {
+      cancelNewProjectBtn.addEventListener('click', () => newProjectModal.classList.remove('show'));
+    }
+    if (newProjectModal) {
+      newProjectModal.addEventListener('click', (e) => {
+        if (e.target === newProjectModal) newProjectModal.classList.remove('show');
+      });
+    }
+    if (confirmNewProjectBtn) {
+      confirmNewProjectBtn.addEventListener('click', confirmNewProject);
+    }
+    if (newProjectNameInput) {
+      newProjectNameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          confirmNewProject();
+        }
+      });
+    }
+
     renderProjectList();
     renderRecentList();
   }
@@ -143,11 +173,47 @@ const Home = (() => {
   }
 
   function createNewProject() {
+    const modal = document.getElementById('newProjectModal');
+    if (modal) {
+      document.getElementById('newProjectName').value = '';
+      document.getElementById('newProjectInfo').value = '';
+      modal.classList.add('show');
+      setTimeout(() => document.getElementById('newProjectName').focus(), 100);
+    } else {
+      doCreateNewProject('未命名项目', '');
+    }
+  }
+
+  function confirmNewProject() {
+    const nameInput = document.getElementById('newProjectName');
+    const infoInput = document.getElementById('newProjectInfo');
+    let name = nameInput.value.trim();
+    const info = infoInput.value.trim();
+
+    if (!name) {
+      name = '未命名项目';
+    }
+
+    document.getElementById('newProjectModal').classList.remove('show');
+    doCreateNewProject(name, info);
+  }
+
+  function doCreateNewProject(name, info) {
     State.clearAll();
     State.setZoom(1);
     State.setOffset(0, 0);
     localStorage.removeItem(CURRENT_KEY);
+    localStorage.setItem('metroMapCurrentProjectName', name);
+    localStorage.setItem('metroMapCurrentProjectInfo', info);
+    updateProjectNameDisplay(name);
     hide();
+  }
+
+  function updateProjectNameDisplay(name) {
+    const el = document.getElementById('currentProjectName');
+    if (el) {
+      el.textContent = name || 'Metro Line Map Drawing Tool';
+    }
   }
 
   function openProject(id) {
@@ -159,6 +225,9 @@ const Home = (() => {
     State.setZoom(1);
     State.setOffset(0, 0);
     localStorage.setItem(CURRENT_KEY, id);
+    localStorage.setItem('metroMapCurrentProjectName', project.name);
+    localStorage.setItem('metroMapCurrentProjectInfo', project.info || '');
+    updateProjectNameDisplay(project.name);
     addRecent(id);
     hide();
   }
@@ -174,13 +243,14 @@ const Home = (() => {
     const projects = getProjects();
     const existing = projects.find(p => p.id === existingId);
 
-    const name = prompt('请输入项目名称：', existing ? existing.name : '未命名项目');
-    if (!name) return;
+    const name = localStorage.getItem('metroMapCurrentProjectName') || '未命名项目';
+    const info = localStorage.getItem('metroMapCurrentProjectInfo') || '';
 
     const projectData = State.exportProjectData(name);
     const summary = {
       id: existingId || generateProjectId(),
       name: name,
+      info: info,
       data: projectData.data,
       stations: state.stations.length,
       lines: state.lines.length,
@@ -277,6 +347,9 @@ const Home = (() => {
           projects.push(newProject);
           saveProjects(projects);
           localStorage.setItem(CURRENT_KEY, newProject.id);
+          localStorage.setItem('metroMapCurrentProjectName', newProject.name);
+          localStorage.setItem('metroMapCurrentProjectInfo', '');
+          updateProjectNameDisplay(newProject.name);
           State.setZoom(1);
           State.setOffset(0, 0);
           hide();
@@ -294,8 +367,7 @@ const Home = (() => {
   // MLMDT 导出（从导出窗口调用）
   function exportMLMDT() {
     const state = State.getState();
-    const name = prompt('请输入导出项目名称：', '未命名项目');
-    if (!name) return;
+    const name = localStorage.getItem('metroMapCurrentProjectName') || '未命名项目';
 
     const projectData = State.exportProjectData(name);
     const json = JSON.stringify(projectData, null, 2);
@@ -332,5 +404,5 @@ const Home = (() => {
     return div.innerHTML;
   }
 
-  return { init, show, hide, saveCurrentProject, saveCurrentAndReturn, exportMLMDT };
+  return { init, show, hide, createNewProject, saveCurrentProject, saveCurrentAndReturn, exportMLMDT };
 })();

@@ -81,6 +81,10 @@ body {
   font-weight: 600;
   color: var(--text-primary);
   letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 300px;
 }
 
 .top-actions {
@@ -261,8 +265,43 @@ body {
 
 /* 小型模态窗口 */
 .modal-sm {
-  max-width: 400px;
-  width: 90%;
+  width: 400px;
+  max-width: 90vw;
+}
+
+/* ========== 弹窗固定尺寸 ========== */
+#exportModal .modal {
+  width: 900px;
+  height: 600px;
+  max-width: 95vw;
+  max-height: 90vh;
+}
+
+#resetConfirmModal .modal {
+  width: 400px;
+  max-width: 90vw;
+}
+
+#resetConfirmModal .modal-body {
+  flex-direction: column;
+  padding: 24px;
+  text-align: center;
+}
+
+#newProjectModal .modal {
+  width: 400px;
+  max-width: 90vw;
+}
+
+#newProjectModal .modal-body {
+  flex-direction: column;
+  padding: 20px;
+  gap: 16px;
+}
+
+#newProjectModal textarea {
+  resize: none;
+  font-family: inherit;
 }
 
 .divider {
@@ -1048,8 +1087,6 @@ body {
   flex: 1;
   overflow: auto;
   padding: 20px;
-  display: flex;
-  gap: 20px;
 }
 
 .preview-area {
@@ -1398,14 +1435,16 @@ body {
 }
 
 /* ========== 导出面板布局修复 ========== */
-.modal-body {
+#exportModal .modal-body {
   display: flex;
   gap: 20px;
+  overflow: hidden;
 }
 
-.preview-area {
+#exportModal .preview-area {
   flex: 3;
   min-width: 0;
+  overflow: auto;
 }
 
 .export-sections {
@@ -1418,6 +1457,8 @@ body {
   padding: 12px 0;
   border-top: 1px solid var(--border);
   margin-top: 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .export-toggle {
@@ -1488,6 +1529,8 @@ body {
   width: 400px;
   max-width: 400px;
   min-width: 400px;
+  height: 480px;
+  max-height: 90vh;
 }
 
 .settings-body {
@@ -1548,10 +1591,14 @@ body {
   width: 500px;
   max-width: 500px;
   min-width: 500px;
+  height: 560px;
+  max-height: 90vh;
 }
 
 .welcome-step {
   padding: 30px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .welcome-header {

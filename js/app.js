@@ -1,8 +1,4 @@
-// 主应用入口
-document.addEventListener('DOMContentLoaded', () => {
-  init();
-});
-
+// 主应用入口 - 由 loader.js 在所有资源加载完毕后调用 window.startApp()
 function init() {
   Canvas.init();
   Properties.init();

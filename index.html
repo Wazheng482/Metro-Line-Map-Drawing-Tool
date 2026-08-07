@@ -5,9 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>地铁线路图绘制工具-Metro Line Map Drawing Tool</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%233b82f6'><circle cx='8' cy='8' r='5'/><circle cx='8' cy='8' r='2' fill='white'/></svg>">
-<link rel="stylesheet" href="css/styles.css?v=11">
+<link rel="stylesheet" href="css/styles.css?v=13">
 </head>
 <body>
+
+<!-- 加载页面 -->
+<div id="loadingScreen" class="loading-screen">
+  <div class="loading-content">
+    <div class="loading-logo">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2">
+        <circle cx="8" cy="8" r="6"/>
+        <circle cx="8" cy="8" r="3"/>
+        <circle cx="8" cy="8" r="1.2" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="loading-title">Metro Line Map Drawing Tool</div>
+    <div class="loading-progress-wrapper">
+      <div class="loading-progress-bar">
+        <div class="loading-progress-fill" id="loadingProgressFill"></div>
+      </div>
+      <div class="loading-progress-text" id="loadingProgressText">0%</div>
+    </div>
+    <div class="loading-status" id="loadingStatus">正在加载资源...</div>
+  </div>
+</div>
 
 <!-- 主页视图 -->
 <div id="homeView" class="home-view" style="display:none;">
@@ -59,11 +80,7 @@
         </button>
       </div>
       <div class="brand">
-        <svg class="brand-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="8" cy="8" r="5"/>
-          <circle cx="8" cy="8" r="2" fill="currentColor"/>
-        </svg>
-        <span class="brand-name">Metro Line Map Drawing Tool</span>
+        <span class="brand-name" id="currentProjectName">Metro Line Map Drawing Tool</span>
       </div>
     </div>
     <div class="top-actions">
@@ -313,6 +330,32 @@
     </div>
   </div>
 
+  <!-- 新建项目弹窗 -->
+  <div class="modal-overlay" id="newProjectModal">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2 data-i18n="newProject">新建项目</h2>
+        <button class="btn-icon" id="closeNewProjectBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="prop-group">
+          <label class="prop-label" data-i18n="projectName">项目名称</label>
+          <input type="text" class="prop-input" id="newProjectName" placeholder="请输入项目名称" maxlength="50" data-i18n-placeholder="projectNamePlaceholder">
+        </div>
+        <div class="prop-group">
+          <label class="prop-label" data-i18n="projectInfo">项目信息</label>
+          <textarea class="prop-input" id="newProjectInfo" placeholder="请输入项目信息（可选）" rows="3" maxlength="200" data-i18n-placeholder="projectInfoPlaceholder"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="cancelNewProjectBtn" data-i18n="cancel">取消</button>
+        <button class="btn-primary" id="confirmNewProjectBtn" data-i18n="create">创建</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 欢迎向导模态窗口 -->
   <div class="modal-overlay" id="welcomeModal">
     <div class="modal welcome-modal">
@@ -432,17 +475,18 @@
   </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="vendor/mespeak/mespeak.js?v=11"></script>
-<script src="js/state.js?v=11"></script>
-<script src="js/geometry.js?v=11"></script>
-<script src="js/settings.js?v=11"></script>
-<script src="js/welcome.js?v=11"></script>
-<script src="js/canvas.js?v=11"></script>
-<script src="js/properties.js?v=11"></script>
-<script src="js/toolbar.js?v=11"></script>
-<script src="js/export.js?v=11"></script>
-<script src="js/home.js?v=11"></script>
-<script src="js/app.js?v=11"></script>
+<script src="vendor/mespeak/mespeak.js?v=13"></script>
+<script src="js/loader.js?v=13"></script>
+<script src="js/state.js?v=13"></script>
+<script src="js/geometry.js?v=13"></script>
+<script src="js/settings.js?v=13"></script>
+<script src="js/welcome.js?v=13"></script>
+<script src="js/canvas.js?v=13"></script>
+<script src="js/properties.js?v=13"></script>
+<script src="js/toolbar.js?v=13"></script>
+<script src="js/export.js?v=13"></script>
+<script src="js/home.js?v=13"></script>
+<script src="js/app.js?v=13"></script>
 
 </body>
 </html>

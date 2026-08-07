@@ -144,7 +144,12 @@ const Settings = (() => {
       guide1: '选择站点工具，点击画布创建站点',
       guide2: '选择线路工具，从站点拖拽经过其他站点创建线路',
       guide3: '拖拽回起点可创建环线，多站点共用即为换乘站',
-      guide4: '点击站点或线路，在左侧属性面板编辑名称和颜色'
+      guide4: '点击站点或线路，在左侧属性面板编辑名称和颜色',
+      newProject: '新建项目',
+      projectName: '项目名称',
+      projectInfo: '项目信息',
+      projectNamePlaceholder: '请输入项目名称',
+      projectInfoPlaceholder: '请输入项目信息（可选）'
     },
     en: {
       export: 'Export',
@@ -290,7 +295,12 @@ const Settings = (() => {
       guide1: 'Select station tool, click canvas to create station',
       guide2: 'Select line tool, drag from station through other stations to create line',
       guide3: 'Drag back to start to form a loop. Shared stations become interchange stations',
-      guide4: 'Click station or line, edit name and color in the left panel'
+      guide4: 'Click station or line, edit name and color in the left panel',
+      newProject: 'New Project',
+      projectName: 'Project Name',
+      projectInfo: 'Project Info',
+      projectNamePlaceholder: 'Enter project name',
+      projectInfoPlaceholder: 'Enter project info (optional)'
     }
   };
 
@@ -566,6 +576,13 @@ const Settings = (() => {
       const key = el.getAttribute('data-i18n-title');
       if (t[key]) {
         el.title = t[key];
+      }
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (t[key]) {
+        el.placeholder = t[key];
       }
     });
 
