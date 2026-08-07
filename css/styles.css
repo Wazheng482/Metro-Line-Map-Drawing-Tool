@@ -1895,10 +1895,14 @@ body {
 .home-main {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: auto;
-  padding: 40px;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.home-main .project-list {
+  flex: 1;
+  overflow-y: auto;
 }
 
 .home-welcome {

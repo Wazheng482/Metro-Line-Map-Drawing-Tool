@@ -2,24 +2,36 @@
 const Home = (() => {
   const STORAGE_KEY = 'metroMapProjects';
   const CURRENT_KEY = 'metroMapCurrentProject';
-  let homeView, editorView, projectListEl;
+  let homeView, editorView, projectListEl, recentListEl;
 
   function init() {
     homeView = document.getElementById('homeView');
     editorView = document.getElementById('app');
     projectListEl = document.getElementById('projectList');
+    recentListEl = document.getElementById('recentList');
 
     document.getElementById('homeNewBtn').addEventListener('click', createNewProject);
     document.getElementById('homeImportBtn').addEventListener('click', importProject);
     document.getElementById('homeImportInput').addEventListener('change', handleImportFile);
 
+    // 主页设置按钮（双重绑定确保可用）
+    const homeSettingsBtn = document.getElementById('homeSettingsBtn');
+    if (homeSettingsBtn) {
+      homeSettingsBtn.addEventListener('click', () => {
+        const modal = document.getElementById('settingsModal');
+        if (modal) modal.classList.add('show');
+      });
+    }
+
     renderProjectList();
+    renderRecentList();
   }
 
   function show() {
     homeView.style.display = 'flex';
     editorView.style.display = 'none';
     renderProjectList();
+    renderRecentList();
   }
 
   function hide() {
@@ -80,6 +92,56 @@ const Home = (() => {
     });
   }
 
+  function renderRecentList() {
+    if (!recentListEl) return;
+    const recentIds = getRecentIds();
+    const projects = getProjects();
+
+    // 过滤出最近打开的项目（最多5个）
+    const recentProjects = recentIds
+      .map(id => projects.find(p => p.id === id))
+      .filter(p => p)
+      .slice(0, 5);
+
+    if (recentProjects.length === 0) {
+      recentListEl.innerHTML = '<div class="project-empty">暂无最近项目</div>';
+      return;
+    }
+
+    recentListEl.innerHTML = recentProjects.map(p => `
+      <div class="project-item" data-id="${p.id}">
+        <div class="project-info">
+          <div class="project-name">${escapeHtml(p.name)}</div>
+          <div class="project-meta">
+            <span>${p.stations || 0} 站 / ${p.lines || 0} 线</span>
+            <span>${formatDate(p.modified)}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    recentListEl.querySelectorAll('.project-item').forEach(item => {
+      item.addEventListener('click', () => {
+        openProject(item.dataset.id);
+      });
+    });
+  }
+
+  function getRecentIds() {
+    try {
+      return JSON.parse(localStorage.getItem('metroMapRecent') || '[]');
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function addRecent(id) {
+    let recent = getRecentIds().filter(rid => rid !== id);
+    recent.unshift(id);
+    recent = recent.slice(0, 10);
+    localStorage.setItem('metroMapRecent', JSON.stringify(recent));
+  }
+
   function createNewProject() {
     State.clearAll();
     State.setZoom(1);
@@ -97,6 +159,7 @@ const Home = (() => {
     State.setZoom(1);
     State.setOffset(0, 0);
     localStorage.setItem(CURRENT_KEY, id);
+    addRecent(id);
     hide();
   }
 
@@ -169,7 +232,11 @@ const Home = (() => {
     if (localStorage.getItem(CURRENT_KEY) === id) {
       localStorage.removeItem(CURRENT_KEY);
     }
+    // 同步清理最近打开列表
+    const recent = getRecentIds().filter(rid => rid !== id);
+    localStorage.setItem('metroMapRecent', JSON.stringify(recent));
     renderProjectList();
+    renderRecentList();
   }
 
   // MLMDT 导入

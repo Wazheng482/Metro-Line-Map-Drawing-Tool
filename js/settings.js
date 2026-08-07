@@ -359,19 +359,25 @@ const Settings = (() => {
     const settingsModal = document.getElementById('settingsModal');
     const closeSettingsBtn = document.getElementById('closeSettingsBtn');
 
-    settingsBtn.addEventListener('click', () => {
-      settingsModal.classList.add('show');
-    });
+    if (settingsBtn) {
+      settingsBtn.addEventListener('click', () => {
+        settingsModal.classList.add('show');
+      });
+    }
 
-    closeSettingsBtn.addEventListener('click', () => {
-      settingsModal.classList.remove('show');
-    });
-
-    settingsModal.addEventListener('click', (e) => {
-      if (e.target === settingsModal) {
+    if (closeSettingsBtn) {
+      closeSettingsBtn.addEventListener('click', () => {
         settingsModal.classList.remove('show');
-      }
-    });
+      });
+    }
+
+    if (settingsModal) {
+      settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) {
+          settingsModal.classList.remove('show');
+        }
+      });
+    }
 
     // 主页设置按钮
     const homeSettingsBtn = document.getElementById('homeSettingsBtn');
