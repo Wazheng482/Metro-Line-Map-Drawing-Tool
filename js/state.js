@@ -283,6 +283,12 @@ const State = (() => {
     notify();
   }
 
+  // 静默更新视图（不触发 notify，避免重复渲染）
+  function updateView(zoomValue, x, y) {
+    state.zoom = Math.max(0.25, Math.min(4, zoomValue));
+    state.offset = { x, y };
+  }
+
   function clearAll() {
     state.stations = [];
     state.lines = [];
@@ -327,7 +333,7 @@ const State = (() => {
     appendStationToLine, appendStationsToLine,
     addTextBlock, updateTextBlock, deleteTextBlock,
     setTool, selectElement, setConnectingFrom, setReconnectingLine,
-    setZoom, setOffset, setView,
+    setZoom, setOffset, setView, updateView,
     undo, redo,
     clearAll, deleteSelected,
     pushHistory

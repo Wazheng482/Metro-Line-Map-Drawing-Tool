@@ -7,6 +7,9 @@ const Canvas = (() => {
   let panStart = null;
   let panMoved = false;
   let panClickPending = false;
+  let panStationPoint = null; // 站点工具：待创建站点的画布坐标（点击时使用）
+  let panStartClient = null; // mousedown 时的客户端坐标，用于拖拽阈值判断
+  const PAN_THRESHOLD = 4; // 拖拽阈值（像素），低于此值视为点击
   let dragState = null;
   let lineDragState = null; // 连续拖拽连线路：{ stationIds: [], isExtending, extendLineId, extendAtStart, existingStationIds }
   let hoverStationId = null;
@@ -84,8 +87,10 @@ const Canvas = (() => {
         // 线路工具下拖拽空白 = 平移地图
         startPan(e);
       } else if (state.selectedTool === 'station') {
-        // 站点工具：点击空白处创建站点
-        State.addStation(point.x, point.y);
+        // 站点工具：按下时记录起点，先当作潜在平移；松开时若未拖拽则创建站点
+        startPan(e);
+        panClickPending = true;
+        panStationPoint = { x: point.x, y: point.y };
       } else if (state.selectedTool === 'select') {
         // 选择工具下拖拽空白 = 平移地图；点击（不拖拽）= 取消选中
         startPan(e);
@@ -98,6 +103,7 @@ const Canvas = (() => {
     isPanning = true;
     panMoved = false;
     panStart = { x: e.clientX - offset.x, y: e.clientY - offset.y };
+    panStartClient = { x: e.clientX, y: e.clientY };
     svg.style.cursor = 'grabbing';
   }
 
@@ -111,8 +117,16 @@ const Canvas = (() => {
 
   function onCanvasMouseMove(e) {
     if (isPanning) {
-      panMoved = true;
-      panClickPending = false;
+      // 未超过阈值前不算拖拽，避免微小抖动导致点击失效
+      if (!panMoved && panStartClient) {
+        const dx = e.clientX - panStartClient.x;
+        const dy = e.clientY - panStartClient.y;
+        if (Math.sqrt(dx * dx + dy * dy) < PAN_THRESHOLD) {
+          return;
+        }
+        panMoved = true;
+        panClickPending = false;
+      }
       offset.x = e.clientX - panStart.x;
       offset.y = e.clientY - panStart.y;
       applyTransform();
@@ -139,14 +153,21 @@ const Canvas = (() => {
     // 平移结束
     if (isPanning) {
       if (panClickPending && !panMoved) {
-        // 点击（未拖拽）= 取消选中
-        State.selectElement(null);
+        if (panStationPoint) {
+          // 站点工具：点击（未拖拽）= 创建站点
+          State.addStation(panStationPoint.x, panStationPoint.y);
+        } else {
+          // 选择工具：点击（未拖拽）= 取消选中
+          State.selectElement(null);
+        }
       } else if (panMoved) {
         // 拖拽结束，同时提交 zoom 和 offset 到状态
         State.setView(zoom, offset.x, offset.y);
       }
       isPanning = false;
       panClickPending = false;
+      panStationPoint = null;
+      panStartClient = null;
       svg.style.cursor = '';
       return;
     }
@@ -252,6 +273,8 @@ const Canvas = (() => {
   function onCanvasMouseLeave() {
     isPanning = false;
     panClickPending = false;
+    panStationPoint = null;
+    panStartClient = null;
     dragState = null;
     lineDragState = null;
     hoverStationId = null;
@@ -275,6 +298,8 @@ const Canvas = (() => {
     // 直接更新 transform，不触发 renderAll
     applyTransform();
     updateZoomLabel();
+    // 静默同步到 state，避免下次 notify（如创建站点）时回滚缩放
+    State.updateView(zoom, offset.x, offset.y);
   }
 
   function updateZoomLabel() {
