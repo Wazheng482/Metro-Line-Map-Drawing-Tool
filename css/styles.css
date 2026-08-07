@@ -102,12 +102,12 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 6px;
+  padding: 8px;
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -126,10 +126,6 @@ body {
 .tool-group .tool-btn svg {
   width: 16px;
   height: 16px;
-}
-
-.tool-group .tool-btn span {
-  display: none;
 }
 
 .btn-ghost {
@@ -634,6 +630,15 @@ body {
   stroke-linecap: round;
   stroke-linejoin: round;
   transition: filter 0.15s ease;
+}
+
+.line-hitbox {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: stroke;
 }
 
 .line-group:hover .line-path {
@@ -1434,6 +1439,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0;
+}
+
+.settings-body .prop-select {
+  width: 100px;
+  min-width: 100px;
 }
 
 .settings-section {

@@ -179,7 +179,8 @@ const State = (() => {
       nameEn: `Line ${lineNum}`,
       color: options.color || '#E53935',
       stationIds: [...stationIds],
-      isLoop: options.isLoop || false
+      isLoop: options.isLoop || false,
+      type: options.type || 'normal'
     };
     state.lines.push(line);
     state.selectedElement = { type: 'line', id: line.id };

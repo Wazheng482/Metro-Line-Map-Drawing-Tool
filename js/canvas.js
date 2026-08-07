@@ -431,22 +431,26 @@ const Canvas = (() => {
 
     // 站点图形 - 根据站点被引用的线路数量自动判断换乘
     const linesReferencing = state.lines.filter(l => l.stationIds.includes(station.id));
-    const isTransfer = linesReferencing.length > 1;
+    const lineCount = linesReferencing.length;
+    const isTransfer = lineCount > 1;
+    // 换乘站大小根据线路数量动态调整，2线换乘只比普通站大一点
+    const transferRadius = Math.min(7 + lineCount * 1.2, 14);
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('class', 'station-circle');
     circle.setAttribute('cx', station.x);
     circle.setAttribute('cy', station.y);
-    circle.setAttribute('r', isTransfer ? 10 : 7);
+    circle.setAttribute('r', isTransfer ? transferRadius : 6);
     
     if (isTransfer) {
       circle.setAttribute('fill', '#f1f5f9');
       circle.setAttribute('stroke', '#0f172a');
-      circle.setAttribute('stroke-width', '3');
+      circle.setAttribute('stroke-width', '2');
       
+      const innerR = Math.max(2, Math.min(5, transferRadius - 3));
       const innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       innerCircle.setAttribute('cx', station.x);
       innerCircle.setAttribute('cy', station.y);
-      innerCircle.setAttribute('r', 4);
+      innerCircle.setAttribute('r', innerR);
       innerCircle.setAttribute('fill', '#0f172a');
       g.appendChild(innerCircle);
     } else {
@@ -548,6 +552,8 @@ const Canvas = (() => {
         id: station.id,
         offsetX: point.x - station.x,
         offsetY: point.y - station.y,
+        startX: station.x,
+        startY: station.y,
         moved: false
       };
       svg.style.cursor = 'grabbing';
@@ -565,23 +571,50 @@ const Canvas = (() => {
 
   function onStationDblClick(e, station) {
     e.stopPropagation();
-    const newName = prompt('输入站点名称:', station.name);
-    if (newName !== null) {
-      State.updateStation(station.id, { name: newName });
-    }
+    // 内联编辑：将文字变为可编辑输入框
+    State.selectElement({ type: 'station', id: station.id });
+    Properties.focusStationName(station.id);
   }
 
   function handleDragging(e) {
     if (!dragState) return;
 
-    const point = getCanvasPoint(e.clientX, e.clientY);
-    
+    let point = getCanvasPoint(e.clientX, e.clientY);
+
     if (dragState.type === 'station') {
       const state = State.getState();
       const station = state.stations.find(s => s.id === dragState.id);
       if (station) {
-        station.x = point.x - dragState.offsetX;
-        station.y = point.y - dragState.offsetY;
+        let newX = point.x - dragState.offsetX;
+        let newY = point.y - dragState.offsetY;
+
+        // Shift 键：8 方向约束（0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°）
+        if (e.shiftKey) {
+          const dx = newX - dragState.startX;
+          const dy = newY - dragState.startY;
+          const adx = Math.abs(dx);
+          const ady = Math.abs(dy);
+
+          if (adx > ady * 2) {
+            // 水平
+            newX = dragState.startX + dx;
+            newY = dragState.startY;
+          } else if (ady > adx * 2) {
+            // 垂直
+            newX = dragState.startX;
+            newY = dragState.startY + dy;
+          } else {
+            // 45° 对角
+            const signX = dx > 0 ? 1 : -1;
+            const signY = dy > 0 ? 1 : -1;
+            const len = Math.min(adx, ady);
+            newX = dragState.startX + signX * len;
+            newY = dragState.startY + signY * len;
+          }
+        }
+
+        station.x = newX;
+        station.y = newY;
         dragState.moved = true;
         renderAll();
       }
@@ -606,25 +639,47 @@ const Canvas = (() => {
     const points = Geometry.generateMultiStationPath(pathStations);
     const pathData = Geometry.pointsToPathData(points);
     const isSelected = state.selectedElement?.type === 'line' && state.selectedElement.id === line.id;
+    const isHighSpeed = line.type === 'highspeed';
+    const baseWidth = isHighSpeed ? 5 : 3;
+    const strokeWidth = isSelected ? baseWidth + 1 : baseWidth;
 
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.setAttribute('class', 'line-group' + (isSelected ? ' selected' : ''));
     g.setAttribute('data-id', line.id);
     g.setAttribute('data-type', 'line');
 
-    // 粗线（点击区域）
+    // 点击区域（透明粗线）
     const hitbox = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     hitbox.setAttribute('class', 'line-hitbox');
     hitbox.setAttribute('d', pathData);
     g.appendChild(hitbox);
 
-    // 实际线路
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('class', 'line-path');
-    path.setAttribute('d', pathData);
-    path.setAttribute('stroke', line.color);
-    path.setAttribute('stroke-width', isSelected ? 5 : 4);
-    g.appendChild(path);
+    if (isHighSpeed) {
+      // 高铁线：双线效果（外描边 + 内主线）
+      const outerPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      outerPath.setAttribute('class', 'line-path');
+      outerPath.setAttribute('d', pathData);
+      outerPath.setAttribute('stroke', line.color);
+      outerPath.setAttribute('stroke-width', strokeWidth + 2);
+      outerPath.setAttribute('fill', 'none');
+      g.appendChild(outerPath);
+
+      const innerPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      innerPath.setAttribute('class', 'line-path');
+      innerPath.setAttribute('d', pathData);
+      innerPath.setAttribute('stroke', '#ffffff');
+      innerPath.setAttribute('stroke-width', strokeWidth - 1);
+      innerPath.setAttribute('fill', 'none');
+      g.appendChild(innerPath);
+    } else {
+      // 普通线
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('class', 'line-path');
+      path.setAttribute('d', pathData);
+      path.setAttribute('stroke', line.color);
+      path.setAttribute('stroke-width', strokeWidth);
+      g.appendChild(path);
+    }
 
     // 线路标签
     if (line.name) {

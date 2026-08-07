@@ -110,6 +110,10 @@ const Properties = (() => {
         sliderGroup.style.background = hex + '33';
         sliderGroup.style.borderColor = hex;
       }
+      // 更新滑动条轨迹颜色，使其跟随当前颜色
+      rInput.style.background = `linear-gradient(to right, rgb(0,${rgb.g},${rgb.b}), rgb(255,${rgb.g},${rgb.b}))`;
+      gInput.style.background = `linear-gradient(to right, rgb(${rgb.r},0,${rgb.b}), rgb(${rgb.r},255,${rgb.b}))`;
+      bInput.style.background = `linear-gradient(to right, rgb(${rgb.r},${rgb.g},0), rgb(${rgb.r},${rgb.g},255))`;
       hexInput.value = hex;
       skipRender = true;
       onChange(hex);
@@ -148,6 +152,10 @@ const Properties = (() => {
           sliderGroup.style.background = val + '33';
           sliderGroup.style.borderColor = val;
         }
+        // 同步更新滑动条轨迹
+        rInput.style.background = `linear-gradient(to right, rgb(0,${rgb.g},${rgb.b}), rgb(255,${rgb.g},${rgb.b}))`;
+        gInput.style.background = `linear-gradient(to right, rgb(${rgb.r},0,${rgb.b}), rgb(${rgb.r},255,${rgb.b}))`;
+        bInput.style.background = `linear-gradient(to right, rgb(${rgb.r},${rgb.g},0), rgb(${rgb.r},${rgb.g},255))`;
         skipRender = true;
         onChange(val);
         skipRender = false;
@@ -240,6 +248,13 @@ const Properties = (() => {
           <input type="text" class="prop-input" id="lineNameEn" value="${escapeHtml(line.nameEn || '')}" placeholder="Line Name">
         </div>
         <div class="prop-group">
+          <label class="prop-label">${Settings.t('lineType')}</label>
+          <select class="prop-input prop-select" id="lineType" style="width:140px;">
+            <option value="normal" ${(line.type || 'normal') === 'normal' ? 'selected' : ''}>${Settings.t('normalLine')}</option>
+            <option value="highspeed" ${line.type === 'highspeed' ? 'selected' : ''}>${Settings.t('highSpeedLine')}</option>
+          </select>
+        </div>
+        <div class="prop-group">
           <label class="prop-label">${Settings.t('lineColor')}</label>
           ${renderColorSlider(line.color, 'lineColor', (hex) => {
             State.updateLine(line.id, { color: hex });
@@ -248,7 +263,7 @@ const Properties = (() => {
         <div class="prop-group">
           <label class="prop-label">${Settings.t('stationInfo')}</label>
           <div style="font-size:12px; color:var(--text-muted); padding:8px; background:var(--bg-primary); border-radius:6px;">
-            <div>${Settings.t('lineType')}: ${line.isLoop ? Settings.t('loopLine') : Settings.t('normalLine')}</div>
+            <div>${Settings.t('loopLineLabel')}: ${line.isLoop ? Settings.t('yes') : Settings.t('no')}</div>
             <div style="margin-top:4px;">${Settings.t('stationCount')}: ${line.stationIds.length}</div>
             <div style="margin-top:4px; line-height:1.6;">${Settings.t('passThrough')}: ${line.stationIds.map(id => getStationName(id)).join(' → ')}${line.isLoop ? ' → ' + getStationName(line.stationIds[0]) : ''}</div>
           </div>
@@ -285,6 +300,13 @@ const Properties = (() => {
     document.getElementById('lineNameEn').addEventListener('change', () => {
       State.pushHistory();
     });
+
+    const lineTypeSel = document.getElementById('lineType');
+    if (lineTypeSel) {
+      lineTypeSel.addEventListener('change', (e) => {
+        State.updateLine(line.id, { type: e.target.value });
+      });
+    }
 
     bindColorSlider('lineColor', line.color, (hex) => {
       State.updateLine(line.id, { color: hex }, { silent: true });
@@ -387,11 +409,21 @@ const Properties = (() => {
     return station ? station.name : Settings.t('unknown');
   }
 
+  function focusStationName(stationId) {
+    setTimeout(() => {
+      const el = document.getElementById('stationName');
+      if (el) {
+        el.focus();
+        el.select();
+      }
+    }, 50);
+  }
+
   function escapeHtml(str) {
     const div = document.createElement('div');
     div.textContent = str || '';
     return div.innerHTML;
   }
 
-  return { init, render };
+  return { init, render, focusStationName };
 })();

@@ -81,16 +81,49 @@ const Geometry = (() => {
   }
 
   /**
-   * 将路径点转换为 SVG path 数据
+   * 将路径点转换为 SVG path 数据（带圆角）
    */
   function pointsToPathData(points) {
     if (points.length === 0) return '';
     if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
     
     let d = `M ${points[0].x} ${points[0].y}`;
-    for (let i = 1; i < points.length; i++) {
-      d += ` L ${points[i].x} ${points[i].y}`;
+    
+    if (points.length === 2) {
+      d += ` L ${points[1].x} ${points[1].y}`;
+      return d;
     }
+
+    const cornerRadius = 3;
+    
+    for (let i = 1; i < points.length - 1; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const next = points[i + 1];
+      
+      // 计算到当前角点的距离
+      const distPrev = distance(prev.x, prev.y, curr.x, curr.y);
+      const distNext = distance(curr.x, curr.y, next.x, next.y);
+      const r = Math.min(cornerRadius, distPrev / 2, distNext / 2);
+      
+      // 沿 prev->curr 方向回退 r
+      const tPrev = r / distPrev;
+      const p1x = curr.x + (prev.x - curr.x) * tPrev;
+      const p1y = curr.y + (prev.y - curr.y) * tPrev;
+      
+      // 沿 curr->next 方向前进 r
+      const tNext = r / distNext;
+      const p2x = curr.x + (next.x - curr.x) * tNext;
+      const p2y = curr.y + (next.y - curr.y) * tNext;
+      
+      // 画到 p1，然后用二次贝塞尔曲线到 p2（控制点为角点）
+      d += ` L ${p1x} ${p1y} Q ${curr.x} ${curr.y} ${p2x} ${p2y}`;
+    }
+    
+    // 最后一段直线
+    const last = points[points.length - 1];
+    d += ` L ${last.x} ${last.y}`;
+    
     return d;
   }
 

@@ -255,20 +255,22 @@ const Export = (() => {
     if (!state.lines || state.lines.length === 0) return;
 
     const lines = state.lines;
-    const pad = 12;
-    const barWidth = 6;
-    const barHeight = 40;
-    const entryGap = 8;
-    const textGap = 8;
     const langs = getLegendLangs();
     const showCn = langs.cn;
     const showEn = langs.en;
+    const isSingleLang = (showCn !== showEn);
+
+    const pad = isSingleLang ? 14 : 12;
+    const barWidth = isSingleLang ? 8 : 6;
+    const barHeight = isSingleLang ? 30 : 40;
+    const entryGap = 10;
+    const textGap = 10;
 
     function estimateTextWidth(line) {
       let w = 0;
-      if (showCn) w = Math.max(w, (line.name || '').length * 14);
-      if (showEn) w = Math.max(w, (line.nameEn || '').length * 7);
-      return Math.max(60, w);
+      if (showCn) w = Math.max(w, (line.name || '').length * (isSingleLang ? 17 : 14));
+      if (showEn) w = Math.max(w, (line.nameEn || '').length * (isSingleLang ? 10 : 7));
+      return Math.max(isSingleLang ? 80 : 60, w);
     }
 
     const maxTextWidth = Math.max(...lines.map(estimateTextWidth));
@@ -322,13 +324,13 @@ const Export = (() => {
       group.appendChild(bar);
 
       const textX = entryX + barWidth + textGap;
-      let nameY = entryY + 16;
+      let nameY = entryY + (isSingleLang ? 20 : 16);
 
       if (showCn) {
         const nameCn = document.createElementNS(SVG_NS, 'text');
         nameCn.setAttribute('x', textX);
         nameCn.setAttribute('y', nameY);
-        nameCn.setAttribute('font-size', '13');
+        nameCn.setAttribute('font-size', isSingleLang ? '18' : '13');
         nameCn.setAttribute('font-weight', 'bold');
         nameCn.setAttribute('font-family', 'Microsoft YaHei, sans-serif');
         nameCn.setAttribute('fill', '#0f172a');
@@ -339,8 +341,8 @@ const Export = (() => {
       if (showEn) {
         const nameEn = document.createElementNS(SVG_NS, 'text');
         nameEn.setAttribute('x', textX);
-        nameEn.setAttribute('y', nameY + (showCn ? 16 : 0));
-        nameEn.setAttribute('font-size', '10');
+        nameEn.setAttribute('y', nameY + (showCn ? (isSingleLang ? 0 : 16) : 0));
+        nameEn.setAttribute('font-size', isSingleLang ? '14' : '10');
         nameEn.setAttribute('font-family', 'Microsoft YaHei, sans-serif');
         nameEn.setAttribute('fill', '#64748b');
         nameEn.textContent = line.nameEn || '';
