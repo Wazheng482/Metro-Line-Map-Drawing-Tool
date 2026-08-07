@@ -79,11 +79,12 @@ const State = (() => {
 
   // 站点操作
   function addStation(x, y) {
+    const idx = state.stations.length + 1;
     const station = {
       id: generateId('station'),
       x, y,
-      name: `站点${state.stations.length + 1}`,
-      nameEn: '',
+      name: `站点${idx}`,
+      nameEn: `Station ${idx}`,
       labelPosition: 'right'
     };
     state.stations.push(station);
