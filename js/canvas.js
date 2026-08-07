@@ -275,15 +275,21 @@ const Canvas = (() => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
     const newZoom = Math.max(0.25, Math.min(4, zoom * delta));
-    
+    if (newZoom === zoom) return;
+
     // 以鼠标位置为中心缩放
     const rect = svg.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-    
+
     offset.x = mouseX - (mouseX - offset.x) * (newZoom / zoom);
     offset.y = mouseY - (mouseY - offset.y) * (newZoom / zoom);
     zoom = newZoom;
+
+    // 如果正在平移，同步更新 panStart，避免下一次 mousemove 用旧值覆盖 offset
+    if (isPanning) {
+      panStart = { x: e.clientX - offset.x, y: e.clientY - offset.y };
+    }
 
     // 直接更新 transform，不触发 renderAll
     applyTransform();
