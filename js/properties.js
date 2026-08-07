@@ -160,6 +160,7 @@ const Properties = (() => {
 
   function renderStationProps(station) {
     const positions = [
+      { key: 'auto', label: '⊗', text: Settings.t('labelAuto') },
       { key: 'top-left', label: '↖', text: '左上' },
       { key: 'top', label: '↑', text: '上' },
       { key: 'top-right', label: '↗', text: '右上' },
@@ -172,7 +173,7 @@ const Properties = (() => {
     ];
 
     // 计算默认位置
-    const currentPos = station.labelPosition || 'right';
+    const currentPos = station.labelPosition || 'auto';
 
     panel.innerHTML = `
       <div class="prop-form">

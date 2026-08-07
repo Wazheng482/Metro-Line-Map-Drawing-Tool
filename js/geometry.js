@@ -192,6 +192,82 @@ const Geometry = (() => {
   }
 
   /**
+   * 自动计算站点标签的最佳位置
+   * 分析站点连接的所有线路方向，选择线路最少的方向放置标签
+   * @param {Object} station - 站点对象
+   * @param {Array} lines - 所有线路
+   * @param {Array} stations - 所有站点
+   * @returns {string} 位置标识符（如 'right', 'top' 等）
+   */
+  function computeAutoLabelPosition(station, lines, stations) {
+    const stationMap = {};
+    stations.forEach(s => { stationMap[s.id] = s; });
+
+    // 8 个方向，统计每个方向的线路数
+    const dirCount = {
+      'right': 0, 'bottom-right': 0, 'bottom': 0, 'bottom-left': 0,
+      'left': 0, 'top-left': 0, 'top': 0, 'top-right': 0
+    };
+    const dirMap = ['right', 'bottom-right', 'bottom', 'bottom-left', 'left', 'top-left', 'top', 'top-right'];
+
+    // 遍历所有包含该站点的线路
+    const connectedLines = lines.filter(l => l.stationIds.includes(station.id));
+
+    if (connectedLines.length === 0) {
+      return 'right';
+    }
+
+    for (const line of connectedLines) {
+      const idx = line.stationIds.indexOf(station.id);
+      const neighborIds = [];
+      if (idx > 0) neighborIds.push(line.stationIds[idx - 1]);
+      if (idx < line.stationIds.length - 1) neighborIds.push(line.stationIds[idx + 1]);
+
+      for (const nid of neighborIds) {
+        const neighbor = stationMap[nid];
+        if (!neighbor) continue;
+
+        const dx = neighbor.x - station.x;
+        const dy = neighbor.y - station.y;
+        if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue;
+
+        // atan2: 0=右, PI/2=下(SVG坐标), PI=左, -PI/2=上
+        const deg = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+        const sector = Math.round(deg / 45) % 8;
+        dirCount[dirMap[sector]]++;
+      }
+    }
+
+    // 优先选择基本方向（上下左右），其次对角方向
+    const cardinal = ['top', 'bottom', 'left', 'right'];
+    const diagonal = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+    const allDirs = [...cardinal, ...diagonal];
+
+    let bestDir = 'right';
+    let minCount = Infinity;
+
+    // 第一轮：只看基本方向
+    for (const dir of cardinal) {
+      if (dirCount[dir] < minCount) {
+        minCount = dirCount[dir];
+        bestDir = dir;
+      }
+    }
+
+    // 如果基本方向都有线路，再看对角方向
+    if (minCount > 0) {
+      for (const dir of allDirs) {
+        if (dirCount[dir] < minCount) {
+          minCount = dirCount[dir];
+          bestDir = dir;
+        }
+      }
+    }
+
+    return bestDir;
+  }
+
+  /**
    * 根据标签位置计算标签的偏移
    */
   function getLabelOffset(position, radius = 18) {
@@ -273,6 +349,7 @@ const Geometry = (() => {
     pathLength,
     pathMidpoint,
     getLabelOffset,
+    computeAutoLabelPosition,
     distance,
     findNearestStation,
     findNearestTextBlock,

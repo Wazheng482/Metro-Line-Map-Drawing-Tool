@@ -85,7 +85,7 @@ const State = (() => {
       x, y,
       name: `站点${idx}`,
       nameEn: `Station ${idx}`,
-      labelPosition: 'right'
+      labelPosition: 'auto'
     };
     state.stations.push(station);
     state.selectedElement = { type: 'station', id: station.id };
@@ -334,7 +334,7 @@ const State = (() => {
         y: s.y + 30,
         name: s.name,
         nameEn: s.nameEn,
-        labelPosition: s.labelPosition || 'right'
+        labelPosition: s.labelPosition || 'auto'
       };
       state.stations.push(newStation);
       state.selectedElement = { type: 'station', id: newStation.id };

@@ -1900,6 +1900,12 @@ body {
 }
 
 /* 顶栏左侧按钮组 */
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .top-left-actions {
   display: flex;
   align-items: center;

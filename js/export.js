@@ -220,7 +220,10 @@ const Export = (() => {
 
       // 中文标签
       if (station.name) {
-        const offset = Geometry.getLabelOffset(station.labelPosition);
+        const labelPos = station.labelPosition === 'auto'
+          ? Geometry.computeAutoLabelPosition(station, state.lines, state.stations)
+          : (station.labelPosition || 'right');
+        const offset = Geometry.getLabelOffset(labelPos);
         const label = document.createElementNS(SVG_NS, 'text');
         label.setAttribute('x', x + offset.x);
         label.setAttribute('y', y + offset.y);
