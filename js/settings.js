@@ -35,6 +35,11 @@ const Settings = (() => {
       lineNameEn: '线路名称（英文）',
       labelPosition: '标签位置',
       labelAuto: '自动',
+      resetData: '重置数据',
+      resetDataTitle: '重置数据',
+      resetDataConfirm: '是否重置所有数据？数据一旦重置，不可恢复！',
+      cancel: '取消',
+      confirm: '确认',
       stationType: '站点类型',
       normalStation: '普通站',
       interchangeStation: '换乘站',
@@ -176,6 +181,11 @@ const Settings = (() => {
       lineNameEn: 'Line Name (EN)',
       labelPosition: 'Label Position',
       labelAuto: 'Auto',
+      resetData: 'Reset Data',
+      resetDataTitle: 'Reset Data',
+      resetDataConfirm: 'Are you sure you want to reset all data? This cannot be undone!',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
       stationType: 'Station Type',
       normalStation: 'Normal',
       interchangeStation: 'Interchange',
@@ -363,6 +373,14 @@ const Settings = (() => {
       }
     });
 
+    // 主页设置按钮
+    const homeSettingsBtn = document.getElementById('homeSettingsBtn');
+    if (homeSettingsBtn) {
+      homeSettingsBtn.addEventListener('click', () => {
+        settingsModal.classList.add('show');
+      });
+    }
+
     document.querySelectorAll('.bg-option').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.bg-option').forEach(b => b.classList.remove('active'));
@@ -385,6 +403,60 @@ const Settings = (() => {
       currentLang = e.target.value;
       applyLanguage();
       saveSettings();
+    });
+
+    // 重置数据按钮
+    const resetDataBtn = document.getElementById('resetDataBtn');
+    const resetConfirmModal = document.getElementById('resetConfirmModal');
+    const resetConfirmBtn = document.getElementById('resetConfirmBtn');
+    const resetCancelBtn = document.getElementById('resetCancelBtn');
+    const closeResetBtn = document.getElementById('closeResetBtn');
+    let resetCountdown = null;
+
+    resetDataBtn.addEventListener('click', () => {
+      resetConfirmModal.classList.add('show');
+      // 5 秒倒计时
+      let seconds = 5;
+      resetConfirmBtn.disabled = true;
+      resetConfirmBtn.textContent = `${Settings.t('confirm')} (${seconds})`;
+      if (resetCountdown) clearInterval(resetCountdown);
+      resetCountdown = setInterval(() => {
+        seconds--;
+        if (seconds > 0) {
+          resetConfirmBtn.textContent = `${Settings.t('confirm')} (${seconds})`;
+        } else {
+          clearInterval(resetCountdown);
+          resetCountdown = null;
+          resetConfirmBtn.disabled = false;
+          resetConfirmBtn.textContent = Settings.t('confirm');
+        }
+      }, 1000);
+    });
+
+    function closeResetModal() {
+      resetConfirmModal.classList.remove('show');
+      if (resetCountdown) {
+        clearInterval(resetCountdown);
+        resetCountdown = null;
+      }
+      // 重置倒计时状态
+      resetConfirmBtn.disabled = true;
+      resetConfirmBtn.textContent = `${Settings.t('confirm')} (5)`;
+    }
+
+    closeResetBtn.addEventListener('click', closeResetModal);
+    resetCancelBtn.addEventListener('click', closeResetModal);
+    resetConfirmModal.addEventListener('click', (e) => {
+      if (e.target === resetConfirmModal) closeResetModal();
+    });
+
+    resetConfirmBtn.addEventListener('click', () => {
+      if (resetConfirmBtn.disabled) return;
+      // 清除所有 localStorage 数据
+      localStorage.clear();
+      closeResetModal();
+      // 刷新页面回到主页
+      location.reload();
     });
   }
 

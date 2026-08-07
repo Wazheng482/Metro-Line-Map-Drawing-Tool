@@ -28,6 +28,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         新建项目
       </button>
+      <button class="btn-ghost" id="homeSettingsBtn" title="设置">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
     </div>
   </div>
   <div class="home-body">
@@ -249,6 +252,7 @@
       </div>
     </div>
   </div>
+</div><!-- /#app -->
 
   <!-- 设置模态窗口 -->
   <div class="modal-overlay" id="settingsModal">
@@ -288,6 +292,28 @@
             <a href="#" class="settings-link" id="showPrivacyBtn" data-i18n="privacyPolicy">隐私政策</a>
           </div>
           <div class="settings-copyright">© 2026 zeenyoung</div>
+        </div>
+        <div class="settings-section">
+          <button class="btn-reset" id="resetDataBtn" data-i18n="resetData">重置数据</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 重置数据确认弹窗 -->
+  <div class="modal-overlay" id="resetConfirmModal">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2 data-i18n="resetDataTitle">重置数据</h2>
+        <button class="btn-icon" id="closeResetBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" style="text-align:center;">
+        <p style="font-size:15px; color:var(--text-primary); margin-bottom:24px;" data-i18n="resetDataConfirm">是否重置所有数据？数据一旦重置，不可恢复！</p>
+        <div style="display:flex; justify-content:flex-end; gap:12px;">
+          <button class="btn-ghost" id="resetCancelBtn" data-i18n="cancel">取消</button>
+          <button class="btn-danger-solid" id="resetConfirmBtn" disabled>确认 (5)</button>
         </div>
       </div>
     </div>
@@ -410,7 +436,6 @@
       </div>
     </div>
   </div>
-</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="vendor/mespeak/mespeak.js?v=11"></script>

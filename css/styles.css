@@ -210,6 +210,61 @@ body {
   height: 16px;
 }
 
+/* 重置数据按钮 */
+.btn-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #ef4444;
+  border-radius: var(--radius-sm);
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.btn-reset:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* 实心危险按钮（确认重置） */
+.btn-danger-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 20px;
+  background: #ef4444;
+  border: 1px solid #ef4444;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.btn-danger-solid:hover:not(:disabled) {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.btn-danger-solid:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 小型模态窗口 */
+.modal-sm {
+  max-width: 400px;
+  width: 90%;
+}
+
 .divider {
   width: 1px;
   height: 24px;
