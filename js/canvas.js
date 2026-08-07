@@ -192,9 +192,7 @@ const Canvas = (() => {
 
     const hoverStation = Geometry.findNearestStation(point.x, point.y, state.stations, 30);
     if (hoverStation && !lineDragState.stationIds.includes(hoverStation.id)) {
-      if (!lineDragState.isExtending || !lineDragState.existingStationIds.includes(hoverStation.id)) {
-        lineDragState.stationIds.push(hoverStation.id);
-      }
+      lineDragState.stationIds.push(hoverStation.id);
     }
 
     // 自动检测环线：如果最后一个站点回到了起点
@@ -210,12 +208,6 @@ const Canvas = (() => {
         });
         State.setReconnectingLine(null);
         State.setTool('select');
-      } else if (lineDragState.isExtending) {
-        const newStations = lineDragState.stationIds.slice(1);
-        if (newStations.length > 0) {
-          const toAdd = lineDragState.extendAtStart ? newStations.reverse() : newStations;
-          State.appendStationsToLine(lineDragState.extendLineId, toAdd, lineDragState.extendAtStart);
-        }
       } else {
         State.addLineWithStations(lineDragState.stationIds, { isLoop });
       }
@@ -233,9 +225,7 @@ const Canvas = (() => {
     const hoverStation = Geometry.findNearestStation(point.x, point.y, state.stations, 30);
 
     if (hoverStation && !lineDragState.stationIds.includes(hoverStation.id)) {
-      if (!lineDragState.isExtending || !lineDragState.existingStationIds.includes(hoverStation.id)) {
-        lineDragState.stationIds.push(hoverStation.id);
-      }
+      lineDragState.stationIds.push(hoverStation.id);
     }
 
     // 自动检测环线：悬停在起点时，显示闭环预览
@@ -433,24 +423,21 @@ const Canvas = (() => {
     const linesReferencing = state.lines.filter(l => l.stationIds.includes(station.id));
     const lineCount = linesReferencing.length;
     const isTransfer = lineCount > 1;
-    // 换乘站大小根据线路数量动态调整，2线换乘只比普通站大一点
-    const transferRadius = Math.min(7 + lineCount * 1.2, 14);
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('class', 'station-circle');
     circle.setAttribute('cx', station.x);
     circle.setAttribute('cy', station.y);
-    circle.setAttribute('r', isTransfer ? transferRadius : 6);
+    circle.setAttribute('r', 6);
     
     if (isTransfer) {
       circle.setAttribute('fill', '#f1f5f9');
       circle.setAttribute('stroke', '#0f172a');
       circle.setAttribute('stroke-width', '2');
       
-      const innerR = Math.max(2, Math.min(5, transferRadius - 3));
       const innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       innerCircle.setAttribute('cx', station.x);
       innerCircle.setAttribute('cy', station.y);
-      innerCircle.setAttribute('r', innerR);
+      innerCircle.setAttribute('r', 2);
       innerCircle.setAttribute('fill', '#0f172a');
       g.appendChild(innerCircle);
     } else {
@@ -501,7 +488,6 @@ const Canvas = (() => {
       if (state.reconnectingLineId) {
         lineDragState = {
           stationIds: [station.id],
-          isExtending: false,
           isReconnecting: true,
           reconnectLineId: state.reconnectingLineId,
           tool: 'line'
@@ -509,34 +495,8 @@ const Canvas = (() => {
         return;
       }
 
-      let isExtending = false;
-      let extendLineId = null;
-      let extendAtStart = false;
-      let existingStationIds = [];
-
-      if (state.selectedElement && state.selectedElement.type === 'line') {
-        const selLine = state.lines.find(l => l.id === state.selectedElement.id);
-        if (selLine && selLine.stationIds.length >= 2) {
-          if (selLine.stationIds[0] === station.id) {
-            isExtending = true;
-            extendLineId = selLine.id;
-            extendAtStart = true;
-            existingStationIds = [...selLine.stationIds];
-          } else if (selLine.stationIds[selLine.stationIds.length - 1] === station.id) {
-            isExtending = true;
-            extendLineId = selLine.id;
-            extendAtStart = false;
-            existingStationIds = [...selLine.stationIds];
-          }
-        }
-      }
-
       lineDragState = {
         stationIds: [station.id],
-        isExtending,
-        extendLineId,
-        extendAtStart,
-        existingStationIds,
         tool: 'line'
       };
       return;
@@ -639,8 +599,7 @@ const Canvas = (() => {
     const pathData = Geometry.pointsToPathData(points);
     const isSelected = state.selectedElement?.type === 'line' && state.selectedElement.id === line.id;
     const lineType = line.type || 'normal';
-    const baseWidth = 3;
-    const strokeWidth = isSelected ? baseWidth + 1 : baseWidth;
+    const strokeWidth = 3;
 
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.setAttribute('class', 'line-group' + (isSelected ? ' selected' : ''));

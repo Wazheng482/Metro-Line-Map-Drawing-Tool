@@ -647,7 +647,7 @@ body {
 }
 
 .line-group.selected .line-path {
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+  filter: brightness(1.1);
 }
 
 .line-group .line-hitbox {
