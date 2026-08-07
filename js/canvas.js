@@ -634,19 +634,19 @@ const Canvas = (() => {
     const stations = line.stationIds.map(id => state.stations.find(s => s.id === id)).filter(Boolean);
     if (stations.length < 2) return;
 
-    // 环线：首尾相连，把第一个站点加到末尾
     const pathStations = line.isLoop ? [...stations, stations[0]] : stations;
     const points = Geometry.generateMultiStationPath(pathStations);
     const pathData = Geometry.pointsToPathData(points);
     const isSelected = state.selectedElement?.type === 'line' && state.selectedElement.id === line.id;
-    const isHighSpeed = line.type === 'highspeed';
-    const baseWidth = isHighSpeed ? 5 : 3;
+    const lineType = line.type || 'normal';
+    const baseWidth = 3;
     const strokeWidth = isSelected ? baseWidth + 1 : baseWidth;
 
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.setAttribute('class', 'line-group' + (isSelected ? ' selected' : ''));
     g.setAttribute('data-id', line.id);
     g.setAttribute('data-type', 'line');
+    g.setAttribute('data-line-type', lineType);
 
     // 点击区域（透明粗线）
     const hitbox = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -654,13 +654,13 @@ const Canvas = (() => {
     hitbox.setAttribute('d', pathData);
     g.appendChild(hitbox);
 
-    if (isHighSpeed) {
-      // 高铁线：双线效果（外描边 + 内主线）
+    if (lineType === 'highspeed') {
+      // 高铁线：空心双线（外描边 + 内白线芯）
       const outerPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       outerPath.setAttribute('class', 'line-path');
       outerPath.setAttribute('d', pathData);
       outerPath.setAttribute('stroke', line.color);
-      outerPath.setAttribute('stroke-width', strokeWidth + 2);
+      outerPath.setAttribute('stroke-width', strokeWidth + 3);
       outerPath.setAttribute('fill', 'none');
       g.appendChild(outerPath);
 
@@ -668,9 +668,18 @@ const Canvas = (() => {
       innerPath.setAttribute('class', 'line-path');
       innerPath.setAttribute('d', pathData);
       innerPath.setAttribute('stroke', '#ffffff');
-      innerPath.setAttribute('stroke-width', strokeWidth - 1);
+      innerPath.setAttribute('stroke-width', Math.max(1, strokeWidth - 1));
       innerPath.setAttribute('fill', 'none');
       g.appendChild(innerPath);
+    } else if (lineType === 'dashed') {
+      // 虚线
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('class', 'line-path');
+      path.setAttribute('d', pathData);
+      path.setAttribute('stroke', line.color);
+      path.setAttribute('stroke-width', strokeWidth);
+      path.setAttribute('stroke-dasharray', '8 5');
+      g.appendChild(path);
     } else {
       // 普通线
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');

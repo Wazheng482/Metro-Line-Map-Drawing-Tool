@@ -252,6 +252,7 @@ const Properties = (() => {
           <select class="prop-input prop-select" id="lineType" style="width:140px;">
             <option value="normal" ${(line.type || 'normal') === 'normal' ? 'selected' : ''}>${Settings.t('normalLine')}</option>
             <option value="highspeed" ${line.type === 'highspeed' ? 'selected' : ''}>${Settings.t('highSpeedLine')}</option>
+            <option value="dashed" ${line.type === 'dashed' ? 'selected' : ''}>${Settings.t('dashedLine')}</option>
           </select>
         </div>
         <div class="prop-group">

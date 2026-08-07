@@ -313,15 +313,50 @@ const Export = (() => {
     lines.forEach((line, i) => {
       const entryX = legendX + pad;
       const entryY = legendY + pad + i * (barHeight + entryGap);
+      const lineType = line.type || 'normal';
 
-      const bar = document.createElementNS(SVG_NS, 'rect');
-      bar.setAttribute('x', entryX);
-      bar.setAttribute('y', entryY);
-      bar.setAttribute('width', barWidth);
-      bar.setAttribute('height', barHeight);
-      bar.setAttribute('fill', line.color || '#999999');
-      bar.setAttribute('rx', '2');
-      group.appendChild(bar);
+      if (lineType === 'highspeed') {
+        // 空心高铁线：外框 + 内白芯
+        const outerBar = document.createElementNS(SVG_NS, 'rect');
+        outerBar.setAttribute('x', entryX);
+        outerBar.setAttribute('y', entryY);
+        outerBar.setAttribute('width', barWidth);
+        outerBar.setAttribute('height', barHeight);
+        outerBar.setAttribute('fill', line.color || '#999999');
+        outerBar.setAttribute('rx', '2');
+        group.appendChild(outerBar);
+
+        const innerBar = document.createElementNS(SVG_NS, 'rect');
+        innerBar.setAttribute('x', entryX + 2);
+        innerBar.setAttribute('y', entryY + 2);
+        innerBar.setAttribute('width', Math.max(1, barWidth - 4));
+        innerBar.setAttribute('height', Math.max(1, barHeight - 4));
+        innerBar.setAttribute('fill', '#ffffff');
+        innerBar.setAttribute('rx', '1');
+        group.appendChild(innerBar);
+      } else if (lineType === 'dashed') {
+        // 虚线：用虚线笔触的线
+        const lineEl = document.createElementNS(SVG_NS, 'line');
+        lineEl.setAttribute('x1', entryX);
+        lineEl.setAttribute('y1', entryY + barHeight / 2);
+        lineEl.setAttribute('x2', entryX + barWidth);
+        lineEl.setAttribute('y2', entryY + barHeight / 2);
+        lineEl.setAttribute('stroke', line.color || '#999999');
+        lineEl.setAttribute('stroke-width', barHeight);
+        lineEl.setAttribute('stroke-dasharray', `${Math.max(3, barHeight * 0.8)} ${Math.max(2, barHeight * 0.5)}`);
+        lineEl.setAttribute('stroke-linecap', 'butt');
+        group.appendChild(lineEl);
+      } else {
+        // 普通线
+        const bar = document.createElementNS(SVG_NS, 'rect');
+        bar.setAttribute('x', entryX);
+        bar.setAttribute('y', entryY);
+        bar.setAttribute('width', barWidth);
+        bar.setAttribute('height', barHeight);
+        bar.setAttribute('fill', line.color || '#999999');
+        bar.setAttribute('rx', '2');
+        group.appendChild(bar);
+      }
 
       const textX = entryX + barWidth + textGap;
       let nameY = entryY + (isSingleLang ? 20 : 16);
