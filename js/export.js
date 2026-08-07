@@ -35,6 +35,16 @@ const Export = (() => {
       updateStartBtn();
     });
 
+    // MLMDT导出面板展开/折叠
+    const toggleMlmdt = document.getElementById('toggleMlmdtExport');
+    const mlmdtPanel = document.getElementById('mlmdtExportPanel');
+    if (toggleMlmdt) {
+      toggleMlmdt.addEventListener('change', () => {
+        mlmdtPanel.classList.toggle('show', toggleMlmdt.checked);
+        updateStartBtn();
+      });
+    }
+
     // 图例位置变更 → 刷新预览
     const legendCorner = document.getElementById('legendCorner');
     if (legendCorner) {
@@ -57,8 +67,9 @@ const Export = (() => {
   function updateStartBtn() {
     const imgChecked = document.getElementById('toggleImageDownload').checked;
     const audioChecked = document.getElementById('toggleAudioDownload').checked;
+    const mlmdtChecked = document.getElementById('toggleMlmdtExport') && document.getElementById('toggleMlmdtExport').checked;
     const btn = document.getElementById('startDownloadBtn');
-    if (!imgChecked && !audioChecked) {
+    if (!imgChecked && !audioChecked && !mlmdtChecked) {
       btn.disabled = true;
       btn.style.opacity = '0.5';
       btn.style.cursor = 'not-allowed';
@@ -72,8 +83,9 @@ const Export = (() => {
   async function startDownload() {
     const imgChecked = document.getElementById('toggleImageDownload').checked;
     const audioChecked = document.getElementById('toggleAudioDownload').checked;
+    const mlmdtChecked = document.getElementById('toggleMlmdtExport') && document.getElementById('toggleMlmdtExport').checked;
 
-    if (!imgChecked && !audioChecked) {
+    if (!imgChecked && !audioChecked && !mlmdtChecked) {
       alert('请至少选择一项下载内容。');
       return;
     }
@@ -87,6 +99,9 @@ const Export = (() => {
     }
     if (audioChecked) {
       tasks.push(downloadAudioZip());
+    }
+    if (mlmdtChecked) {
+      Home.exportMLMDT();
     }
     await Promise.all(tasks);
   }
@@ -702,7 +717,7 @@ if __name__ == '__main__':
       }, 30000);
       try {
         meSpeak.speak(text, {
-          rawdata: 'array',
+          rawdata: true,
           voice: voice,
           amplitude: 100,
           pitch: 50,
@@ -713,8 +728,18 @@ if __name__ == '__main__':
           settled = true;
           clearTimeout(timer);
           if (success && audiodata) {
-            // audiodata 为 Uint8Array，可直接用于 Blob
-            resolve(new Blob([audiodata], { type: 'audio/wav' }));
+            // audiodata 可能是 ArrayBuffer 或 Array，统一转为 Uint8Array 以确保 Blob 正确生成
+            let binaryData;
+            if (audiodata instanceof ArrayBuffer) {
+              binaryData = audiodata;
+            } else if (Array.isArray(audiodata)) {
+              binaryData = new Uint8Array(audiodata);
+            } else if (audiodata.buffer) {
+              binaryData = audiodata.buffer;
+            } else {
+              binaryData = new Uint8Array(audiodata);
+            }
+            resolve(new Blob([binaryData], { type: 'audio/wav' }));
           } else {
             resolve(null);
           }

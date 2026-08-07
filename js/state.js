@@ -309,6 +309,96 @@ const State = (() => {
     else if (type === 'text') deleteTextBlock(id);
   }
 
+  // 复制粘贴
+  let clipboard = null;
+
+  function copySelected() {
+    if (!state.selectedElement) return;
+    const { type, id } = state.selectedElement;
+    if (type === 'station') {
+      const s = state.stations.find(s => s.id === id);
+      if (s) clipboard = { type: 'station', data: { ...s } };
+    } else if (type === 'text') {
+      const t = state.textBlocks.find(t => t.id === id);
+      if (t) clipboard = { type: 'text', data: { ...t } };
+    }
+  }
+
+  function paste() {
+    if (!clipboard) return;
+    if (clipboard.type === 'station') {
+      const s = clipboard.data;
+      const newStation = {
+        id: generateId('station'),
+        x: s.x + 30,
+        y: s.y + 30,
+        name: s.name,
+        nameEn: s.nameEn,
+        labelPosition: s.labelPosition || 'right'
+      };
+      state.stations.push(newStation);
+      state.selectedElement = { type: 'station', id: newStation.id };
+      pushHistory();
+      notify();
+    } else if (clipboard.type === 'text') {
+      const t = clipboard.data;
+      const newText = {
+        id: generateId('text'),
+        x: t.x + 30,
+        y: t.y + 30,
+        content: t.content,
+        fontFamily: t.fontFamily,
+        fontSize: t.fontSize,
+        color: t.color
+      };
+      state.textBlocks.push(newText);
+      state.selectedElement = { type: 'text', id: newText.id };
+      pushHistory();
+      notify();
+    }
+  }
+
+  // 项目数据导出/导入（用于 MLMDT 文件和本地保存）
+  function exportProjectData(name) {
+    return {
+      format: 'MLMDT',
+      version: '1.0',
+      name: name || '未命名项目',
+      exported: new Date().toISOString(),
+      data: {
+        stations: JSON.parse(JSON.stringify(state.stations)),
+        lines: JSON.parse(JSON.stringify(state.lines)),
+        textBlocks: JSON.parse(JSON.stringify(state.textBlocks))
+      }
+    };
+  }
+
+  function importProjectData(projectData) {
+    if (!projectData || projectData.format !== 'MLMDT' || !projectData.data) return false;
+    state.stations = JSON.parse(JSON.stringify(projectData.data.stations || []));
+    state.lines = JSON.parse(JSON.stringify(projectData.data.lines || []));
+    state.textBlocks = JSON.parse(JSON.stringify(projectData.data.textBlocks || []));
+    state.selectedElement = null;
+    state.connectingFrom = null;
+    state.history = [];
+    state.historyIndex = -1;
+    pushHistory();
+    notify();
+    return true;
+  }
+
+  function loadState(stations, lines, textBlocks) {
+    state.stations = JSON.parse(JSON.stringify(stations || []));
+    state.lines = JSON.parse(JSON.stringify(lines || []));
+    state.textBlocks = JSON.parse(JSON.stringify(textBlocks || []));
+    state.selectedElement = null;
+    state.connectingFrom = null;
+    state.history = [];
+    state.historyIndex = -1;
+    pushHistory();
+    notify();
+  }
+
   function getState() {
     return state;
   }
@@ -338,6 +428,8 @@ const State = (() => {
     setZoom, setOffset, setView, updateView,
     undo, redo,
     clearAll, deleteSelected,
+    copySelected, paste,
+    exportProjectData, importProjectData, loadState,
     pushHistory
   };
 })();

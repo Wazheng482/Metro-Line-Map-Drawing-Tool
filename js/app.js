@@ -10,11 +10,19 @@ function init() {
   Export.init();
   Settings.init();
   Welcome.init();
+  Home.init();
   setupGlobalEvents();
   updateZoomDisplay();
+  // 启动时显示主页
+  Home.show();
 }
 
 function setupGlobalEvents() {
+  // 禁止右键菜单
+  document.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+  });
+
   // 键盘快捷键
   document.addEventListener('keydown', (e) => {
     // 如果在输入框中，不处理快捷键
@@ -23,43 +31,55 @@ function setupGlobalEvents() {
     }
 
     const state = State.getState();
-    
+
     // Ctrl+Z 撤销
     if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
       e.preventDefault();
       State.undo();
       return;
     }
-    
+
     // Ctrl+Y / Ctrl+Shift+Z 重做
     if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'Z'))) {
       e.preventDefault();
       State.redo();
       return;
     }
-    
+
+    // Ctrl+C 复制
+    if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+      State.copySelected();
+      return;
+    }
+
+    // Ctrl+V 粘贴
+    if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+      State.paste();
+      return;
+    }
+
     // V - 选择工具
     if (e.key === 'v' || e.key === 'V') {
       State.setTool('select');
     }
-    
+
     // S - 站点工具
     if (e.key === 's' || e.key === 'S') {
       if (!e.ctrlKey && !e.metaKey) State.setTool('station');
     }
-    
+
     // L - 线路工具
     if (e.key === 'l' || e.key === 'L') {
       State.setTool('line');
     }
-    
+
     // Escape - 取消当前操作
     if (e.key === 'Escape') {
       State.setTool('select');
       State.setConnectingFrom(null);
       State.selectElement(null);
     }
-    
+
     // Delete / Backspace - 删除选中元素
     if (e.key === 'Delete' || e.key === 'Backspace') {
       if (state.selectedElement) {
@@ -93,6 +113,16 @@ function setupGlobalEvents() {
   expandLeftBtn.addEventListener('click', () => {
     leftPanel.classList.remove('collapsed');
     expandLeftBtn.classList.remove('visible');
+  });
+
+  // 返回主页按钮
+  document.getElementById('homeBtn').addEventListener('click', () => {
+    Home.saveCurrentAndReturn();
+  });
+
+  // 保存至我的项目按钮
+  document.getElementById('saveProjectBtn').addEventListener('click', () => {
+    Home.saveCurrentProject();
   });
 
   // 监听缩放变化

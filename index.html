@@ -5,13 +5,67 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>地铁线路图绘制工具-Metro Line Map Drawing Tool</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%233b82f6'><circle cx='8' cy='8' r='5'/><circle cx='8' cy='8' r='2' fill='white'/></svg>">
-<link rel="stylesheet" href="css/styles.css?v=10">
+<link rel="stylesheet" href="css/styles.css?v=11">
 </head>
 <body>
+
+<!-- 主页视图 -->
+<div id="homeView" class="home-view" style="display:none;">
+  <div class="home-topbar">
+    <div class="home-brand">
+      <svg class="brand-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="8" r="5"/>
+        <circle cx="8" cy="8" r="2" fill="currentColor"/>
+      </svg>
+      <span class="brand-name">Metro Line Map Drawing Tool</span>
+    </div>
+    <div class="home-actions">
+      <button class="btn-ghost" id="homeImportBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        导入项目
+      </button>
+      <button class="btn-primary" id="homeNewBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新建项目
+      </button>
+    </div>
+  </div>
+  <div class="home-body">
+    <aside class="home-sidebar">
+      <div class="sidebar-header">我的项目</div>
+      <div id="projectList" class="project-list"></div>
+    </aside>
+    <main class="home-main">
+      <div class="home-welcome">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1" style="width:64px;height:64px;color:var(--accent);margin-bottom:20px;">
+          <circle cx="8" cy="8" r="5"/>
+          <circle cx="8" cy="8" r="2" fill="currentColor"/>
+        </svg>
+        <h2>欢迎使用地铁线路图绘制工具</h2>
+        <p>从左侧选择已有项目，或点击上方按钮创建新项目</p>
+        <div class="home-tips">
+          <div class="home-tip"><span class="tip-key">S</span> 站点工具 - 点击画布创建站点</div>
+          <div class="home-tip"><span class="tip-key">L</span> 线路工具 - 拖拽经过站点创建线路</div>
+          <div class="home-tip"><span class="tip-key">V</span> 选择工具 - 选择并编辑元素</div>
+          <div class="home-tip"><span class="tip-key">Ctrl+C/V</span> 复制粘贴站点和文本</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<input type="file" id="homeImportInput" accept=".mlmdt" style="display:none;">
 
 <div id="app">
   <!-- 顶部工具栏 -->
   <header class="top-bar">
+    <div class="top-left-actions">
+      <button class="btn-ghost" id="homeBtn" title="返回主页">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <button class="btn-ghost" id="saveProjectBtn" title="保存至我的项目">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      </button>
+    </div>
     <div class="brand">
       <svg class="brand-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
         <circle cx="8" cy="8" r="5"/>
@@ -178,6 +232,18 @@
 2. 音频为 WAV 格式，自动打包为 ZIP 下载
 3. 完全离线运行，无需联网，无需授权弹窗
 注意：合成音为机器人音。如需真人音质，可使用文本 + Python 脚本方案（gTTS/edge-tts）。
+生成后请等待20秒，如还未开始下载，请重试。
+            </div>
+          </div>
+          <!-- 导出MLMDT文件 -->
+          <label class="export-toggle">
+            <input type="checkbox" id="toggleMlmdtExport">
+            <span>导出 MLMDT 文件</span>
+          </label>
+          <div id="mlmdtExportPanel" class="export-panel">
+            <div class="audio-hint">
+              导出项目文件（.mlmdt），包含所有站点、线路和文本数据。
+该文件仅可使用本工具的"导入项目"功能导入，用于项目备份与迁移。
             </div>
           </div>
         </div>
@@ -351,16 +417,17 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="vendor/mespeak/mespeak.js?v=10"></script>
-<script src="js/state.js?v=10"></script>
-<script src="js/geometry.js?v=10"></script>
-<script src="js/settings.js?v=10"></script>
-<script src="js/welcome.js?v=10"></script>
-<script src="js/canvas.js?v=10"></script>
-<script src="js/properties.js?v=10"></script>
-<script src="js/toolbar.js?v=10"></script>
-<script src="js/export.js?v=10"></script>
-<script src="js/app.js?v=10"></script>
+<script src="vendor/mespeak/mespeak.js?v=11"></script>
+<script src="js/state.js?v=11"></script>
+<script src="js/geometry.js?v=11"></script>
+<script src="js/settings.js?v=11"></script>
+<script src="js/welcome.js?v=11"></script>
+<script src="js/canvas.js?v=11"></script>
+<script src="js/properties.js?v=11"></script>
+<script src="js/toolbar.js?v=11"></script>
+<script src="js/export.js?v=11"></script>
+<script src="js/home.js?v=11"></script>
+<script src="js/app.js?v=11"></script>
 
 </body>
 </html>
