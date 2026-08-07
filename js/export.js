@@ -316,7 +316,38 @@ const Export = (() => {
       const lineType = line.type || 'normal';
 
       if (lineType === 'highspeed') {
-        // 空心高铁线：外框 + 内白芯
+        // 高铁线：两条实线 + 中间虚线
+        const midY = entryY + barHeight / 2;
+        // 上线
+        const topLine = document.createElementNS(SVG_NS, 'line');
+        topLine.setAttribute('x1', entryX);
+        topLine.setAttribute('y1', midY - barHeight * 0.35);
+        topLine.setAttribute('x2', entryX + barWidth);
+        topLine.setAttribute('y2', midY - barHeight * 0.35);
+        topLine.setAttribute('stroke', line.color || '#999999');
+        topLine.setAttribute('stroke-width', '1.5');
+        group.appendChild(topLine);
+        // 下线
+        const bottomLine = document.createElementNS(SVG_NS, 'line');
+        bottomLine.setAttribute('x1', entryX);
+        bottomLine.setAttribute('y1', midY + barHeight * 0.35);
+        bottomLine.setAttribute('x2', entryX + barWidth);
+        bottomLine.setAttribute('y2', midY + barHeight * 0.35);
+        bottomLine.setAttribute('stroke', line.color || '#999999');
+        bottomLine.setAttribute('stroke-width', '1.5');
+        group.appendChild(bottomLine);
+        // 中间虚线
+        const centerLine = document.createElementNS(SVG_NS, 'line');
+        centerLine.setAttribute('x1', entryX);
+        centerLine.setAttribute('y1', midY);
+        centerLine.setAttribute('x2', entryX + barWidth);
+        centerLine.setAttribute('y2', midY);
+        centerLine.setAttribute('stroke', line.color || '#999999');
+        centerLine.setAttribute('stroke-width', '2');
+        centerLine.setAttribute('stroke-dasharray', `${Math.max(3, barHeight * 0.6)} ${Math.max(2, barHeight * 0.4)}`);
+        group.appendChild(centerLine);
+      } else if (lineType === 'hollow') {
+        // 空心线：外框 + 内白芯
         const outerBar = document.createElementNS(SVG_NS, 'rect');
         outerBar.setAttribute('x', entryX);
         outerBar.setAttribute('y', entryY);

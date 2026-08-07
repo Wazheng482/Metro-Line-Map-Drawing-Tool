@@ -128,6 +128,30 @@ const Geometry = (() => {
   }
 
   /**
+   * 沿路径点集偏移（平移），生成偏移后的路径点
+   * offset > 0 表示向左法向偏移，offset < 0 向右法向偏移
+   */
+  function offsetPath(points, offset) {
+    if (points.length < 2) return points.map(p => ({ x: p.x + offset, y: p.y }));
+    const result = [];
+    for (let i = 0; i < points.length; i++) {
+      const prev = points[i - 1] || points[i];
+      const next = points[i + 1] || points[i];
+      const dx = next.x - prev.x;
+      const dy = next.y - prev.y;
+      const len = Math.hypot(dx, dy) || 1;
+      // 垂直方向（左法向）
+      const nx = -dy / len;
+      const ny = dx / len;
+      result.push({
+        x: points[i].x + nx * offset,
+        y: points[i].y + ny * offset
+      });
+    }
+    return result;
+  }
+
+  /**
    * 计算路径的总长度
    */
   function pathLength(points) {
@@ -251,6 +275,7 @@ const Geometry = (() => {
     getLabelOffset,
     distance,
     findNearestStation,
-    findNearestTextBlock
+    findNearestTextBlock,
+    offsetPath
   };
 })();

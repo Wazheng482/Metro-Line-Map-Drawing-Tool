@@ -106,10 +106,6 @@ const Properties = (() => {
       const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
       preview.style.background = hex;
       preview.style.borderColor = hex;
-      if (sliderGroup) {
-        sliderGroup.style.background = hex + '33';
-        sliderGroup.style.borderColor = hex;
-      }
       // 更新滑动条轨迹颜色，使其跟随当前颜色
       rInput.style.background = `linear-gradient(to right, rgb(0,${rgb.g},${rgb.b}), rgb(255,${rgb.g},${rgb.b}))`;
       gInput.style.background = `linear-gradient(to right, rgb(${rgb.r},0,${rgb.b}), rgb(${rgb.r},255,${rgb.b}))`;
@@ -148,10 +144,6 @@ const Properties = (() => {
         bVal.textContent = rgb.b;
         preview.style.background = val;
         preview.style.borderColor = val;
-        if (sliderGroup) {
-          sliderGroup.style.background = val + '33';
-          sliderGroup.style.borderColor = val;
-        }
         // 同步更新滑动条轨迹
         rInput.style.background = `linear-gradient(to right, rgb(0,${rgb.g},${rgb.b}), rgb(255,${rgb.g},${rgb.b}))`;
         gInput.style.background = `linear-gradient(to right, rgb(${rgb.r},0,${rgb.b}), rgb(${rgb.r},255,${rgb.b}))`;
@@ -252,6 +244,7 @@ const Properties = (() => {
           <select class="prop-input prop-select" id="lineType" style="width:140px;">
             <option value="normal" ${(line.type || 'normal') === 'normal' ? 'selected' : ''}>${Settings.t('normalLine')}</option>
             <option value="highspeed" ${line.type === 'highspeed' ? 'selected' : ''}>${Settings.t('highSpeedLine')}</option>
+            <option value="hollow" ${line.type === 'hollow' ? 'selected' : ''}>${Settings.t('hollowLine')}</option>
             <option value="dashed" ${line.type === 'dashed' ? 'selected' : ''}>${Settings.t('dashedLine')}</option>
           </select>
         </div>

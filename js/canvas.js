@@ -655,7 +655,42 @@ const Canvas = (() => {
     g.appendChild(hitbox);
 
     if (lineType === 'highspeed') {
-      // 高铁线：空心双线（外描边 + 内白线芯）
+      // 高铁线：两条连续实线 + 中间断续虚线
+      const offset = 4;
+      const leftPts = Geometry.offsetPath(points, -offset);
+      const rightPts = Geometry.offsetPath(points, offset);
+      const leftPathData = Geometry.pointsToPathData(leftPts);
+      const rightPathData = Geometry.pointsToPathData(rightPts);
+
+      // 左侧实线
+      const leftPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      leftPath.setAttribute('class', 'line-path');
+      leftPath.setAttribute('d', leftPathData);
+      leftPath.setAttribute('stroke', line.color);
+      leftPath.setAttribute('stroke-width', '1.5');
+      leftPath.setAttribute('fill', 'none');
+      g.appendChild(leftPath);
+
+      // 右侧实线
+      const rightPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      rightPath.setAttribute('class', 'line-path');
+      rightPath.setAttribute('d', rightPathData);
+      rightPath.setAttribute('stroke', line.color);
+      rightPath.setAttribute('stroke-width', '1.5');
+      rightPath.setAttribute('fill', 'none');
+      g.appendChild(rightPath);
+
+      // 中间虚线
+      const centerPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      centerPath.setAttribute('class', 'line-path');
+      centerPath.setAttribute('d', pathData);
+      centerPath.setAttribute('stroke', line.color);
+      centerPath.setAttribute('stroke-width', '2');
+      centerPath.setAttribute('stroke-dasharray', '6 4');
+      centerPath.setAttribute('fill', 'none');
+      g.appendChild(centerPath);
+    } else if (lineType === 'hollow') {
+      // 空心线（原高铁样式）
       const outerPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       outerPath.setAttribute('class', 'line-path');
       outerPath.setAttribute('d', pathData);
