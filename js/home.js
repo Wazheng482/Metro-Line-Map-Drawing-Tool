@@ -55,6 +55,20 @@ const Home = (() => {
 
     renderProjectList();
     renderRecentList();
+
+    // 删除确认弹窗事件
+    const deleteModalEl = document.getElementById('deleteConfirmModal');
+    const closeDeleteBtn = document.getElementById('closeDeleteBtn');
+    const deleteCancelBtn = document.getElementById('deleteCancelBtn');
+    const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
+    if (closeDeleteBtn) closeDeleteBtn.addEventListener('click', cancelDeleteProject);
+    if (deleteCancelBtn) deleteCancelBtn.addEventListener('click', cancelDeleteProject);
+    if (deleteConfirmBtn) deleteConfirmBtn.addEventListener('click', confirmDeleteProject);
+    if (deleteModalEl) {
+      deleteModalEl.addEventListener('click', (e) => {
+        if (e.target === deleteModalEl) cancelDeleteProject();
+      });
+    }
   }
 
   function show() {
@@ -301,8 +315,22 @@ const Home = (() => {
     show();
   }
 
+  // 删除确认弹窗的状态
+  let pendingDeleteId = null;
+  let deleteModal = null;
+
   function deleteProject(id) {
-    if (!confirm('确定删除此项目？此操作不可撤销。')) return;
+    pendingDeleteId = id;
+    if (!deleteModal) deleteModal = document.getElementById('deleteConfirmModal');
+    if (deleteModal) deleteModal.classList.add('show');
+  }
+
+  function confirmDeleteProject() {
+    if (!pendingDeleteId) return;
+    const id = pendingDeleteId;
+    pendingDeleteId = null;
+    if (deleteModal) deleteModal.classList.remove('show');
+
     const projects = getProjects().filter(p => p.id !== id);
     saveProjects(projects);
     if (localStorage.getItem(CURRENT_KEY) === id) {
@@ -313,6 +341,12 @@ const Home = (() => {
     localStorage.setItem('metroMapRecent', JSON.stringify(recent));
     renderProjectList();
     renderRecentList();
+    showToast('项目已删除', 'success');
+  }
+
+  function cancelDeleteProject() {
+    pendingDeleteId = null;
+    if (deleteModal) deleteModal.classList.remove('show');
   }
 
   // MLMDT 导入

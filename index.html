@@ -353,6 +353,25 @@
     </div>
   </div>
 
+  <!-- 删除项目确认弹窗 -->
+  <div class="modal-overlay" id="deleteConfirmModal">
+    <div class="modal modal-sm reset-modal-inner">
+      <div class="modal-header">
+        <h2 data-i18n="deleteProjectTitle">删除项目</h2>
+        <button class="btn-icon" id="closeDeleteBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body reset-modal-body">
+        <p class="reset-modal-text" data-i18n="deleteProjectConfirm">确定删除此项目？此操作不可撤销！</p>
+        <div class="reset-modal-btns">
+          <button class="btn-ghost" id="deleteCancelBtn" data-i18n="cancel">取消</button>
+          <button class="btn-danger-solid" id="deleteConfirmBtn" data-i18n="confirm">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 欢迎向导模态窗口 -->
   <div class="modal-overlay" id="welcomeModal">
     <div class="modal welcome-modal">
