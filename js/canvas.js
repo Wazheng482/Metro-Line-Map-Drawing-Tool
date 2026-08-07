@@ -690,17 +690,6 @@ const Canvas = (() => {
       g.appendChild(path);
     }
 
-    // 线路标签
-    if (line.name) {
-      const mid = Geometry.pathMidpoint(points);
-      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      label.setAttribute('class', 'line-label');
-      label.setAttribute('x', mid.x);
-      label.setAttribute('y', mid.y - 10);
-      label.textContent = line.name;
-      g.appendChild(label);
-    }
-
     // 事件
     g.addEventListener('mousedown', (e) => onLineMouseDown(e, line));
 
