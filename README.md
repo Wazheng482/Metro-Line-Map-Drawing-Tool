@@ -41,5 +41,5 @@
 5. 多个线路共用站点 → 自动变为换乘站
 6. 选中元素，在左侧属性面板编辑名称、颜色、线型
 
-👉 [在线体验](https://wazheng482.github.io/Metro-Line-Map-Drawing-Tool/)
+👉 [在线体验](https://zeenyonug.github.io/Metro-Line-Map-Drawing-Tool/)
 
