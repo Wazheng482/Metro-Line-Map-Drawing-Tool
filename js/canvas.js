@@ -261,13 +261,13 @@ const Canvas = (() => {
 
     if (isLoopingBack && stationPoints.length > 0) {
       stationPoints.push({ x: stationPoints[0].x, y: stationPoints[0].y });
+      showMultiSegmentPreview(stationPoints, true);
     } else {
       const targetX = hoverStation && !lineDragState.stationIds.includes(hoverStation.id) ? hoverStation.x : point.x;
       const targetY = hoverStation && !lineDragState.stationIds.includes(hoverStation.id) ? hoverStation.y : point.y;
       stationPoints.push({ x: targetX, y: targetY });
+      showMultiSegmentPreview(stationPoints, false);
     }
-
-    showMultiSegmentPreview(stationPoints);
   }
 
   function onCanvasMouseLeave() {
@@ -350,7 +350,7 @@ const Canvas = (() => {
     }
   }
 
-  function showMultiSegmentPreview(stationPoints) {
+  function showMultiSegmentPreview(stationPoints, allFixed = false) {
     clearConnectingPreview();
     if (stationPoints.length < 2) return;
 
@@ -358,9 +358,9 @@ const Canvas = (() => {
     g.id = 'connectingPreview';
     g.setAttribute('pointer-events', 'none');
 
-    // 已固定段（实线）
-    if (stationPoints.length > 2) {
-      const fixedPoints = Geometry.generateMultiStationPath(stationPoints.slice(0, -1));
+    if (allFixed) {
+      // 全部固定（如环线闭合时）
+      const fixedPoints = Geometry.generateMultiStationPath(stationPoints);
       const fixedPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       fixedPath.setAttribute('d', Geometry.pointsToPathData(fixedPoints));
       fixedPath.setAttribute('fill', 'none');
@@ -368,20 +368,32 @@ const Canvas = (() => {
       fixedPath.setAttribute('stroke-width', '4');
       fixedPath.setAttribute('opacity', '0.85');
       g.appendChild(fixedPath);
-    }
+    } else {
+      // 已固定段（实线）
+      if (stationPoints.length > 2) {
+        const fixedPoints = Geometry.generateMultiStationPath(stationPoints.slice(0, -1));
+        const fixedPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        fixedPath.setAttribute('d', Geometry.pointsToPathData(fixedPoints));
+        fixedPath.setAttribute('fill', 'none');
+        fixedPath.setAttribute('stroke', '#f59e0b');
+        fixedPath.setAttribute('stroke-width', '4');
+        fixedPath.setAttribute('opacity', '0.85');
+        g.appendChild(fixedPath);
+      }
 
-    // 实时段（虚线，从最后固定站到鼠标）
-    const last = stationPoints[stationPoints.length - 2];
-    const end = stationPoints[stationPoints.length - 1];
-    const livePoints = Geometry.generatePath(last.x, last.y, end.x, end.y);
-    const livePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    livePath.setAttribute('d', Geometry.pointsToPathData(livePoints));
-    livePath.setAttribute('fill', 'none');
-    livePath.setAttribute('stroke', '#f59e0b');
-    livePath.setAttribute('stroke-width', '3');
-    livePath.setAttribute('stroke-dasharray', '8 4');
-    livePath.setAttribute('opacity', '0.6');
-    g.appendChild(livePath);
+      // 实时段（虚线，从最后固定站到鼠标）
+      const last = stationPoints[stationPoints.length - 2];
+      const end = stationPoints[stationPoints.length - 1];
+      const livePoints = Geometry.generatePath(last.x, last.y, end.x, end.y);
+      const livePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      livePath.setAttribute('d', Geometry.pointsToPathData(livePoints));
+      livePath.setAttribute('fill', 'none');
+      livePath.setAttribute('stroke', '#f59e0b');
+      livePath.setAttribute('stroke-width', '3');
+      livePath.setAttribute('stroke-dasharray', '8 4');
+      livePath.setAttribute('opacity', '0.6');
+      g.appendChild(livePath);
+    }
 
     contentGroup.appendChild(g);
   }
