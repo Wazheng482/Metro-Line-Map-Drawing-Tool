@@ -192,26 +192,45 @@ const Home = (() => {
     localStorage.setItem('metroMapRecent', JSON.stringify(recent));
   }
 
+  function getDefaultProjectName() {
+    const lang = (typeof Settings !== 'undefined' && Settings.getCurrentLang) ? Settings.getCurrentLang() : 'zh';
+    const baseName = lang === 'zh' ? '未命名项目' : 'Untitled Project';
+    const projects = getProjects();
+    const existingNames = new Set(projects.map(p => p.name));
+
+    if (!existingNames.has(baseName)) return baseName;
+
+    let i = 2;
+    while (existingNames.has(lang === 'zh' ? `${baseName}（${i}）` : `${baseName} (${i})`)) {
+      i++;
+    }
+    return lang === 'zh' ? `${baseName}（${i}）` : `${baseName} (${i})`;
+  }
+
   function createNewProject() {
     const modal = document.getElementById('newProjectModal');
     if (modal) {
-      document.getElementById('newProjectName').value = '';
+      document.getElementById('newProjectName').value = getDefaultProjectName();
       document.getElementById('newProjectInfo').value = '';
       modal.classList.add('show');
       setTimeout(() => document.getElementById('newProjectName').focus(), 100);
+      setTimeout(() => document.getElementById('newProjectName').select(), 110);
     } else {
-      doCreateNewProject('未命名项目', '');
+      doCreateNewProject(getDefaultProjectName(), '');
     }
   }
 
   function confirmNewProject() {
     const nameInput = document.getElementById('newProjectName');
     const infoInput = document.getElementById('newProjectInfo');
-    let name = nameInput.value.trim();
+    const name = nameInput.value.trim();
     const info = infoInput.value.trim();
 
     if (!name) {
-      name = '未命名项目';
+      const lang = (typeof Settings !== 'undefined' && Settings.getCurrentLang) ? Settings.getCurrentLang() : 'zh';
+      showToast(lang === 'zh' ? '请输入项目名称' : 'Please enter a project name', 'error');
+      nameInput.focus();
+      return;
     }
 
     document.getElementById('newProjectModal').classList.remove('show');
